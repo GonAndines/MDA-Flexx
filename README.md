@@ -8,7 +8,7 @@ Herramienta interna de la mesa de ayuda: novedades del equipo, informes, registr
 
 | Pestaña | Qué hace |
 |---|---|
-| **Resumen** | Novedades del equipo por mes (alta, edición y baja, navegando entre meses) e informes actualizados recientemente. |
+| **Resumen** | Derivador de la central telefónica (IVR): cada destino muestra su secuencia (ej. Desarrollo = 2-1-3) y al tocarlo resalta el camino. El menú se edita en `src/lib/ivr.ts`. Debajo, novedades del equipo por mes (alta, edición y baja, navegando entre meses) e informes actualizados recientemente. |
 | **Soporte Básico** | Lista de empresas con soporte Básico y sus casos del mes. Registrar un caso: empresa + número de ticket (se puede pegar la URL) + fecha. El ticket abre `https://soporte.flexxus.com.ar/tickets/<número>`. Cada empresa tiene **5 casos por mes calendario**: al llegar, la app avisa "sin llamadas disponibles" y el sexto en adelante queda marcado como excedido. No permite repetir un ticket. |
 | **Respuestas rápidas** | Respuestas predefinidas con categorías, búsqueda (sin importar acentos), botón Copiar, alta, edición y baja. |
 | **Cotizador** | Tabla de tareas cotizables con lo que se cotiza según el soporte (horas, "–" no aplica, a cotizar o valor fijo) y dos tarifas sin IVA: *con soporte* (Premium, Básico, Por Casos, Order Advanced) y *sin soporte*. Se elige tarea, soporte contratado y modalidad: **remota** = horas × valor hora; **visita** = primera hora + horas restantes × su valor. Muestra total + IVA, IVA 21 % y total con IVA, con botón para copiar. Se pueden agregar y editar tareas y tarifas. |
