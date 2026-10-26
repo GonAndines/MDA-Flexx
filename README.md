@@ -14,6 +14,7 @@ Herramienta interna de la mesa de ayuda: novedades del equipo, informes, registr
 | **Cotizador** | Tabla de tareas cotizables con lo que se cotiza según el soporte (horas, "–" no aplica, a cotizar o valor fijo) y dos tarifas sin IVA: *con soporte* (Premium, Básico, Por Casos, Order Advanced) y *sin soporte*. Se elige tarea, soporte contratado y modalidad: **remota** = horas × valor hora; **visita** = primera hora + horas restantes × su valor. Muestra total + IVA, IVA 21 % y total con IVA, con botón para copiar. Se pueden agregar y editar tareas y tarifas. |
 | **Informes** | Notas de release, uso del sistema, procedimientos, etc. Texto con formato (títulos, listas, negritas, tablas, links) con vista previa, búsqueda y categorías. |
 | **Usuarios** | Solo administradores: alta de usuarios, rol (administrador u operador), activar/desactivar y cambio de contraseña. |
+| **Mi cuenta** | Desde el enlace "Mi cuenta" del encabezado, cada usuario cambia su propia contraseña (pide la actual). |
 
 El límite de casos (5) y el IVA (21 %) están en `src/lib/format.ts`.
 
@@ -85,7 +86,9 @@ vercel --prod
    node scripts/crear-usuarios.mjs usuarios.csv
    ```
 
-4. Las contraseñas quedan en `usuarios-creados.csv`. Pasáselas a cada uno por un canal privado y después **borrá** ese archivo y `usuarios.csv`. Ninguno de los dos se sube a git.
+4. Las contraseñas quedan en `usuarios-creados.csv`. Pasáselas a cada uno por un canal privado (y pediles que la cambien desde **Mi cuenta**) y después **borrá** ese archivo y `usuarios.csv`. Ninguno de los dos se sube a git.
+
+Las filas vacías que agrega Excel al final (`;;;`) se ignoran.
 
 Los emails que ya existen se saltean, así que se puede volver a correr sin duplicar. Sin `DATABASE_URL`, el script usa la base local de desarrollo (con `npm run dev` detenido).
 

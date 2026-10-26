@@ -20,25 +20,26 @@ if (!archivo) {
 }
 
 // ---- Leer el CSV ----
+// Cada fila guarda su número de línea en el archivo; se ignoran las vacías (Excel suele agregar ";;;" al final).
 const filas = readFileSync(archivo, "utf8")
   .replace(/^﻿/, "")
   .split(/\r?\n/)
-  .map((l) => l.trim())
-  .filter(Boolean)
-  .map((l) => l.split(/[;,]/).map((c) => c.trim().replace(/^"|"$/g, "")));
+  .map((l, i) => ({ linea: i + 1, celdas: l.split(/[;,]/).map((c) => c.trim().replace(/^"|"$/g, "")) }))
+  .filter((f) => f.celdas.some(Boolean));
 
-if (filas.length && /email/i.test(filas[0].join(" "))) filas.shift();
+if (filas.length && /email/i.test(filas[0].celdas.join(" "))) filas.shift();
 
 const usuarios = [];
 const errores = [];
-filas.forEach(([nombre, email, rol = ""], i) => {
-  const e = (email ?? "").toLowerCase();
+for (const { linea, celdas } of filas) {
+  const [nombre, email = "", rol = ""] = celdas;
+  const e = email.toLowerCase();
   const r = rol.toLowerCase() || "operador";
-  if (!nombre || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(e)) errores.push(`Fila ${i + 1}: nombre o email inválido`);
-  else if (!["admin", "operador"].includes(r)) errores.push(`Fila ${i + 1}: rol "${rol}" inválido (admin u operador)`);
-  else if (usuarios.some((u) => u.email === e)) errores.push(`Fila ${i + 1}: email repetido ${e}`);
+  if (!nombre || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(e)) errores.push(`Línea ${linea}: nombre o email inválido`);
+  else if (!["admin", "operador"].includes(r)) errores.push(`Línea ${linea}: rol "${rol}" inválido (admin u operador)`);
+  else if (usuarios.some((u) => u.email === e)) errores.push(`Línea ${linea}: email repetido ${e}`);
   else usuarios.push({ nombre, email: e, rol: r });
-});
+}
 
 if (errores.length) {
   console.error("Revisá el CSV:\n  " + errores.join("\n  "));

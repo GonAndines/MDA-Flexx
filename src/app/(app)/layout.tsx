@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Nav } from "@/components/Nav";
 import { requireUsuario } from "@/lib/auth";
 import { logout } from "../login/actions";
@@ -20,9 +21,9 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
           <div className="flex items-center justify-between gap-4 pt-3">
             <span className="font-semibold text-slate-800">Mesa de ayuda</span>
             <div className="flex items-center gap-3 text-sm text-slate-500">
-              <span className="hidden sm:inline">
-                {usuario.nombre} · {usuario.rol === "admin" ? "Administrador" : "Operador"}
-              </span>
+              <Link href="/cuenta" className="hover:text-slate-800 hover:underline" title="Mi cuenta: cambiar contraseña">
+                <span className="hidden sm:inline">{usuario.nombre} · </span>Mi cuenta
+              </Link>
               <form action={logout}>
                 <button type="submit" className="btn-link">
                   Salir
