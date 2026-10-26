@@ -72,6 +72,23 @@ vercel --prod
 
 > En Vercel no se puede usar la base local (el disco es de solo lectura): sin `DATABASE_URL` la aplicación muestra un error explicándolo.
 
+## Alta masiva de usuarios
+
+`scripts/crear-usuarios.mjs` crea varios usuarios de una vez desde un CSV, con una contraseña temporal al azar para cada uno.
+
+1. Copiá `usuarios.ejemplo.csv` como `usuarios.csv` y completá una fila por persona: `nombre;email;rol` (rol `admin` u `operador`; vacío = operador). Se puede armar en Excel y guardar como CSV.
+2. Copiá la cadena de conexión de la base: en Vercel, *Storage → (tu base Neon) → .env.local* (o *Settings → Environment Variables → DATABASE_URL*).
+3. En una terminal `cmd`, en la carpeta del proyecto (las comillas son necesarias porque la URL tiene `&`):
+
+   ```bat
+   set "DATABASE_URL=postgresql://...pegá acá la cadena completa..."
+   node scripts/crear-usuarios.mjs usuarios.csv
+   ```
+
+4. Las contraseñas quedan en `usuarios-creados.csv`. Pasáselas a cada uno por un canal privado y después **borrá** ese archivo y `usuarios.csv`. Ninguno de los dos se sube a git.
+
+Los emails que ya existen se saltean, así que se puede volver a correr sin duplicar. Sin `DATABASE_URL`, el script usa la base local de desarrollo (con `npm run dev` detenido).
+
 ## Estructura
 
 ```

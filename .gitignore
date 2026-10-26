@@ -44,3 +44,7 @@ next-env.d.ts
 
 # base local de desarrollo (PGlite)
 /.data
+
+# alta masiva de usuarios: listas y contraseñas temporales
+/usuarios.csv
+/usuarios-creados.csv
