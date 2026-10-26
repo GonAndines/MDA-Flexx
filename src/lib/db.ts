@@ -14,8 +14,7 @@ export interface Driver {
  * así el proyecto corre localmente sin instalar nada.
  */
 async function createDriver(): Promise<Driver> {
-  // La integración de Neon en Vercel crea DATABASE_URL y, según cómo se conecte, también POSTGRES_URL.
-  const url = process.env.DATABASE_URL || process.env.POSTGRES_URL;
+  const url = process.env.DATABASE_URL;
   if (url) {
     const { neon } = await import("@neondatabase/serverless");
     const sql = neon(url);

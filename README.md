@@ -11,7 +11,7 @@ Herramienta interna de la mesa de ayuda: novedades del equipo, informes, registr
 | **Resumen** | Novedades del equipo por mes (alta, edición y baja, navegando entre meses) e informes actualizados recientemente. |
 | **Soporte Básico** | Lista de empresas con soporte Básico y sus casos del mes. Registrar un caso: empresa + número de ticket (se puede pegar la URL) + fecha. El ticket abre `https://soporte.flexxus.com.ar/tickets/<número>`. Cada empresa tiene **5 casos por mes calendario**: al llegar, la app avisa "sin llamadas disponibles" y el sexto en adelante queda marcado como excedido. No permite repetir un ticket. |
 | **Respuestas rápidas** | Respuestas predefinidas con categorías, búsqueda (sin importar acentos), botón Copiar, alta, edición y baja. |
-| **Cotizador** | Tareas cotizables con sus horas y valor hora por tipo de soporte. Se elige la tarea (o se cargan las horas) y el soporte contratado y muestra `horas × valor hora = total + IVA`, el IVA 21 % y el total con IVA, con botón para copiar la cotización. |
+| **Cotizador** | Tabla de tareas cotizables con lo que se cotiza según el soporte (horas, "–" no aplica, a cotizar o valor fijo) y dos tarifas sin IVA: *con soporte* (Premium, Básico, Por Casos, Order Advanced) y *sin soporte*. Se elige tarea, soporte contratado y modalidad: **remota** = horas × valor hora; **visita** = primera hora + horas restantes × su valor. Muestra total + IVA, IVA 21 % y total con IVA, con botón para copiar. Se pueden agregar y editar tareas y tarifas. |
 | **Informes** | Notas de release, uso del sistema, procedimientos, etc. Texto con formato (títulos, listas, negritas, tablas, links) con vista previa, búsqueda y categorías. |
 | **Usuarios** | Solo administradores: alta de usuarios, rol (administrador u operador), activar/desactivar y cambio de contraseña. |
 
@@ -36,7 +36,7 @@ Abrí http://localhost:3000 e ingresá con `ADMIN_EMAIL` / `ADMIN_PASSWORD`. Si 
 
 **Base de datos local:** si `DATABASE_URL` está vacía se usa [PGlite](https://pglite.dev), un Postgres embebido que guarda los datos en `./.data/pglite`. No hay que instalar nada. Para empezar de cero, frená el servidor y borrá la carpeta `.data`.
 
-La primera vez que arranca, la aplicación crea las tablas y el usuario administrador, y carga las **15 empresas con soporte Básico**, los tipos de soporte con su valor hora y las tareas cotizables (estos dos últimos con valores de ejemplo para reemplazar). En una base nueva agrega además **datos de ejemplo** (respuestas, novedades, informes y algunos casos con tickets ficticios); con `SEED_DEMO=false` no se cargan.
+La primera vez que arranca, la aplicación crea las tablas y el usuario administrador, y carga las **15 empresas con soporte Básico**, las tarifas y la tabla de tareas cotizables vigentes. En una base nueva agrega además **datos de ejemplo** (respuestas, novedades, informes y algunos casos con tickets ficticios); con `SEED_DEMO=false` no se cargan.
 
 **Actualización de bases existentes:** la base guarda su versión de esquema (tabla `schema_version`). Al desplegar una versión nueva, las tablas que faltan se crean solas en el primer acceso. Las tablas de la versión 1 (`planes`, `empresas`, `llamadas`, `tareas`) quedan sin uso y no se borran; se pueden eliminar a mano cuando ya no hagan falta.
 

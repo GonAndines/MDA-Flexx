@@ -20,23 +20,39 @@ const EMPRESAS_BASICO = [
   "VENUS",
 ];
 
-// Valores de ejemplo: reemplazar por el cuadro real.
-const TIPOS_SOPORTE: [string, number][] = [
-  ["Premium", 30000],
-  ["Básico", 40000],
-  ["Order Advanced", 35000],
-  ["Por Casos", 50000],
-  ["Sin Soporte", 60000],
+// Tarifas vigentes (sin IVA): visita primera hora, visita horas restantes, solución remota por hora.
+const TARIFAS: [string, number, number, number][] = [
+  ["Con soporte", 97620, 59164, 59164],
+  ["Sin soporte", 127203, 88746, 88746],
 ];
 
-// Tareas de ejemplo: reemplazar por el listado real.
-const TAREAS: [string, string, number][] = [
-  ["Migración de servidor", "Traspaso de base de datos y sistema a un nuevo servidor", 4],
-  ["Instalación en nueva PC", "Instalación y configuración del sistema en un puesto", 1],
-  ["Renovación de certificado AFIP/ARCA", "Generación e instalación del certificado de factura electrónica", 1],
-  ["Recupero de backup", "Restauración de la base desde una copia de seguridad", 3],
-  ["Capacitación", "Capacitación a usuarios, remota", 2],
+// Tipo de soporte → tarifa que usa.
+const TIPOS_SOPORTE: [string, string][] = [
+  ["Premium", "Con soporte"],
+  ["Básico", "Con soporte"],
+  ["Por Casos", "Con soporte"],
+  ["Order Advanced", "Con soporte"],
+  ["Sin Soporte", "Sin soporte"],
 ];
+
+// Horas por tipo de soporte, en el orden de TIPOS_SOPORTE. "-" = no aplica, "C" = a cotizar, "F" = valor fijo.
+type Celda = number | "-" | "C" | "F";
+const TAREAS: [string, Celda[]][] = [
+  ["Instalación servidor", [4, 4, 4, 4, 4]],
+  ["Instalación puesto", ["-", "-", 1, 1, 1]],
+  ["Diseño de impresión a medida", ["C", "C", "C", "C", "C"]],
+  ["Reacondicionar impresión", ["-", "-", 1, 1, 1]],
+  ["Factura electrónica desde cero", [4, 4, 4, 4, 4]],
+  ["Factura electrónica con backup", [1, 2, 2, 2, 2]],
+  ["Factura electrónica puesto adicional", [1, 1, 1, 1, 1]],
+  ["Facturación de exportación", [4, 4, 4, 4, 4]],
+  ["Consulta a medida", ["C", "C", "C", "C", "C"]],
+  ["Alta razón social", ["F", "F", "F", "F", "F"]],
+  ["Migraciones", ["C", "C", "C", "C", "C"]],
+  ["Servidor de impresión fiscal", ["-", "-", 1, 1, 1]],
+];
+
+const MODO_CELDA = { "-": "no_aplica", C: "a_cotizar", F: "fijo" } as const;
 
 const RESPUESTAS: [string, string, string][] = [
   // título, categoría, texto
@@ -84,11 +100,37 @@ export async function seedBase(d: Driver) {
   if (await vacia(d, "empresas_basico")) {
     await insertMany(d, "empresas_basico", ["nombre"], EMPRESAS_BASICO.map((n) => [n]));
   }
+  if (await vacia(d, "tarifas")) {
+    await insertMany(
+      d,
+      "tarifas",
+      ["nombre", "visita_primera", "visita_restantes", "remota_hora", "orden"],
+      TARIFAS.map((t, i) => [...t, i + 1]),
+    );
+  }
   if (await vacia(d, "tipos_soporte")) {
-    await insertMany(d, "tipos_soporte", ["nombre", "valor_hora", "orden"], TIPOS_SOPORTE.map(([n, v], i) => [n, v, i + 1]));
+    const tarifas = await d.query("select id, nombre from tarifas");
+    await insertMany(
+      d,
+      "tipos_soporte",
+      ["nombre", "tarifa_id", "orden"],
+      TIPOS_SOPORTE.map(([n, tarifa], i) => [n, tarifas.find((t) => t.nombre === tarifa)!.id, i + 1]),
+    );
   }
   if (await vacia(d, "tareas_cotizables")) {
-    await insertMany(d, "tareas_cotizables", ["nombre", "descripcion", "horas"], TAREAS);
+    await insertMany(d, "tareas_cotizables", ["nombre", "orden"], TAREAS.map(([n], i) => [n, i + 1]));
+    const tareas = await d.query("select id, nombre from tareas_cotizables");
+    const tipos = await d.query("select id, nombre from tipos_soporte");
+    const celdas: unknown[][] = [];
+    for (const [nombre, valores] of TAREAS) {
+      const tareaId = tareas.find((t) => t.nombre === nombre)!.id;
+      TIPOS_SOPORTE.forEach(([tipo], i) => {
+        const tipoId = tipos.find((t) => t.nombre === tipo)?.id;
+        const v = valores[i];
+        if (tipoId) celdas.push([tareaId, tipoId, typeof v === "number" ? "horas" : MODO_CELDA[v], typeof v === "number" ? v : null]);
+      });
+    }
+    await insertMany(d, "tarea_soporte", ["tarea_id", "tipo_id", "modo", "valor"], celdas);
   }
 }
 
