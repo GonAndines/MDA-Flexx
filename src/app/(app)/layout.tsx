@@ -1,0 +1,39 @@
+import { Nav } from "@/components/Nav";
+import { requireUsuario } from "@/lib/auth";
+import { logout } from "../login/actions";
+
+export default async function AppLayout({ children }: LayoutProps<"/">) {
+  const usuario = await requireUsuario();
+  const tabs = [
+    { href: "/", label: "Resumen" },
+    { href: "/llamadas", label: "Llamadas" },
+    { href: "/respuestas", label: "Respuestas rápidas" },
+    { href: "/tareas", label: "Tareas adicionales" },
+    { href: "/planes", label: "Planes y empresas" },
+    ...(usuario.rol === "admin" ? [{ href: "/usuarios", label: "Usuarios" }] : []),
+  ];
+
+  return (
+    <>
+      <header className="border-b border-slate-200 bg-white">
+        <div className="mx-auto max-w-7xl px-4">
+          <div className="flex items-center justify-between gap-4 pt-3">
+            <span className="font-semibold text-slate-800">Mesa de ayuda</span>
+            <div className="flex items-center gap-3 text-sm text-slate-500">
+              <span className="hidden sm:inline">
+                {usuario.nombre} · {usuario.rol === "admin" ? "Administrador" : "Operador"}
+              </span>
+              <form action={logout}>
+                <button type="submit" className="btn-link">
+                  Salir
+                </button>
+              </form>
+            </div>
+          </div>
+          <Nav tabs={tabs} />
+        </div>
+      </header>
+      <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-6">{children}</main>
+    </>
+  );
+}
