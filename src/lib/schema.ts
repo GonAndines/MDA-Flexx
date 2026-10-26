@@ -6,8 +6,9 @@ import { seedBase, seedDemo } from "./seed";
  * Versión del esquema. La 1 tenía planes, empresas, llamadas y tareas con valor;
  * esas tablas quedan sin uso en las bases que ya existían (no se borran).
  * La 2 tenía tipos_soporte y tareas_cotizables con valores de ejemplo: la 3 las reemplaza.
+ * La 4 agrega contactos.
  */
-const VERSION = 3;
+const VERSION = 4;
 
 const DDL = [
   `create table if not exists usuarios (
@@ -89,6 +90,13 @@ const DDL = [
     contenido text not null default '',
     usuario_id int references usuarios(id) on delete set null,
     actualizado timestamp not null default (now() at time zone 'UTC')
+  )`,
+  `create table if not exists contactos (
+    id serial primary key,
+    area text not null,
+    tipo text not null check (tipo in ('whatsapp', 'telefono', 'email', 'otro')),
+    valor text not null,
+    detalle text not null default ''
   )`,
   `create table if not exists schema_version (version int not null)`,
 ];

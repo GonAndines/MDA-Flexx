@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Ivr } from "@/components/Ivr";
 import { query } from "@/lib/db";
 import { mesActual, mesValido, moverMes, nombreMes } from "@/lib/format";
+import { Contactos, type Contacto } from "./Contactos";
 import { ListaNovedades, NuevaNovedad, type Novedad } from "./Novedades";
 
 export const metadata = { title: "Resumen · Mesa de ayuda" };
@@ -10,7 +11,7 @@ export default async function ResumenPage({ searchParams }: PageProps<"/">) {
   const sp = await searchParams;
   const mes = mesValido(Array.isArray(sp.mes) ? sp.mes[0] : sp.mes);
 
-  const [novedades, informes] = await Promise.all([
+  const [novedades, informes, contactos] = await Promise.all([
     query<Novedad>(
       `select n.id, to_char(n.mes, 'YYYY-MM') as mes, n.titulo, n.texto, u.nombre as autor,
               to_char(n.creado - interval '3 hours', 'DD/MM/YYYY') as creado
@@ -22,6 +23,7 @@ export default async function ResumenPage({ searchParams }: PageProps<"/">) {
       `select id, titulo, categoria, to_char(actualizado - interval '3 hours', 'DD/MM/YYYY') as actualizado
        from informes order by informes.actualizado desc limit 6`,
     ),
+    query<Contacto>("select id, area, tipo, valor, detalle from contactos order by area, id"),
   ]);
 
   return (
@@ -52,26 +54,29 @@ export default async function ResumenPage({ searchParams }: PageProps<"/">) {
           <ListaNovedades novedades={novedades} mes={mes} />
         </section>
 
-        <aside className="card h-fit p-4">
-          <div className="mb-3 flex items-center justify-between">
-            <h2 className="font-semibold">Informes recientes</h2>
-            <Link href="/informes" className="btn-link">
-              Ver todos
-            </Link>
-          </div>
-          <ul className="space-y-3">
-            {informes.map((i) => (
-              <li key={i.id}>
-                <Link href={`/informes/${i.id}`} className="font-medium text-blue-700 hover:underline">
-                  {i.titulo}
-                </Link>
-                <div className="text-xs text-slate-500">
-                  {i.categoria} · {i.actualizado}
-                </div>
-              </li>
-            ))}
-            {informes.length === 0 && <li className="text-sm text-slate-500">Todavía no hay informes.</li>}
-          </ul>
+        <aside className="space-y-6">
+          <Contactos contactos={contactos} />
+          <section className="card p-4">
+            <div className="mb-3 flex items-center justify-between">
+              <h2 className="font-semibold">Informes recientes</h2>
+              <Link href="/informes" className="btn-link">
+                Ver todos
+              </Link>
+            </div>
+            <ul className="space-y-3">
+              {informes.map((i) => (
+                <li key={i.id}>
+                  <Link href={`/informes/${i.id}`} className="font-medium text-blue-700 hover:underline">
+                    {i.titulo}
+                  </Link>
+                  <div className="text-xs text-slate-500">
+                    {i.categoria} · {i.actualizado}
+                  </div>
+                </li>
+              ))}
+              {informes.length === 0 && <li className="text-sm text-slate-500">Todavía no hay informes.</li>}
+            </ul>
+          </section>
         </aside>
       </div>
     </div>

@@ -23,19 +23,37 @@ export function DeleteButton({ action, confirmText }: { action: () => Promise<Ac
   );
 }
 
+/** Copia al portapapeles; si la API moderna no está permitida, usa el método clásico con una selección temporal. */
+async function copiar(text: string) {
+  try {
+    await navigator.clipboard.writeText(text);
+    return true;
+  } catch {
+    const area = document.createElement("textarea");
+    area.value = text;
+    area.setAttribute("readonly", "");
+    area.style.position = "fixed";
+    area.style.opacity = "0";
+    document.body.appendChild(area);
+    area.select();
+    const ok = document.execCommand("copy");
+    area.remove();
+    return ok;
+  }
+}
+
 export function CopyButton({ text }: { text: string }) {
-  const [copiado, setCopiado] = useState(false);
+  const [estado, setEstado] = useState<"" | "ok" | "error">("");
   return (
     <button
       type="button"
-      className={copiado ? "btn border-emerald-300 text-emerald-700" : "btn"}
+      className={estado === "ok" ? "btn border-emerald-300 text-emerald-700" : estado === "error" ? "btn border-red-300 text-red-700" : "btn"}
       onClick={async () => {
-        await navigator.clipboard.writeText(text);
-        setCopiado(true);
-        setTimeout(() => setCopiado(false), 1500);
+        setEstado((await copiar(text)) ? "ok" : "error");
+        setTimeout(() => setEstado(""), 1500);
       }}
     >
-      {copiado ? "¡Copiado!" : "Copiar"}
+      {estado === "ok" ? "¡Copiado!" : estado === "error" ? "No se pudo copiar" : "Copiar"}
     </button>
   );
 }

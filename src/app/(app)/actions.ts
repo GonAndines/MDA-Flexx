@@ -36,3 +36,43 @@ export async function borrarNovedad(id: number) {
   await query("delete from novedades where id = $1", [id]);
   revalidatePath("/");
 }
+
+// Contactos de las áreas (WhatsApp, teléfonos, mails).
+
+const TIPOS_CONTACTO = ["whatsapp", "telefono", "email", "otro"];
+
+function leerContacto(fd: FormData) {
+  const area = texto(fd, "area");
+  const tipo = texto(fd, "tipo");
+  const valor = texto(fd, "valor");
+  if (!area) return { error: "Indicá el área." } as const;
+  if (!TIPOS_CONTACTO.includes(tipo)) return { error: "Elegí el tipo de contacto." } as const;
+  if (!valor) return { error: "Completá el número o dirección." } as const;
+  if ((tipo === "whatsapp" || tipo === "telefono") && valor.replace(/\D/g, "").length < 6) {
+    return { error: "El número parece incompleto." } as const;
+  }
+  if (tipo === "email" && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(valor)) return { error: "El email no es válido." } as const;
+  return { datos: [area, tipo, valor, texto(fd, "detalle")] } as const;
+}
+
+export async function crearContacto(fd: FormData) {
+  await requireUsuario();
+  const r = leerContacto(fd);
+  if ("error" in r) return r;
+  await query("insert into contactos (area, tipo, valor, detalle) values ($1, $2, $3, $4)", [...r.datos]);
+  revalidatePath("/");
+}
+
+export async function editarContacto(id: number, fd: FormData) {
+  await requireUsuario();
+  const r = leerContacto(fd);
+  if ("error" in r) return r;
+  await query("update contactos set area = $2, tipo = $3, valor = $4, detalle = $5 where id = $1", [id, ...r.datos]);
+  revalidatePath("/");
+}
+
+export async function borrarContacto(id: number) {
+  await requireUsuario();
+  await query("delete from contactos where id = $1", [id]);
+  revalidatePath("/");
+}
