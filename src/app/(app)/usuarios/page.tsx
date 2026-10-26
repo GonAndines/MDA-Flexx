@@ -8,7 +8,7 @@ export default async function UsuariosPage() {
   const yo = await requireAdmin();
   const usuarios = await query<UsuarioFila>(
     `select u.id, u.nombre, u.email, u.rol, u.activo,
-            (select count(*)::int from llamadas l where l.usuario_id = u.id) as llamadas
+            (select count(*)::int from casos c where c.usuario_id = u.id) as casos
      from usuarios u order by u.activo desc, u.nombre`,
   );
   return <Usuarios usuarios={usuarios} yoId={yo.id} />;

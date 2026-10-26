@@ -1,6 +1,6 @@
 # Mesa de ayuda
 
-Herramienta interna para administrar la mesa de ayuda: registro de llamadas de empresas, respuestas rápidas, valores de tareas adicionales y planes de soporte contratados.
+Herramienta interna de la mesa de ayuda: novedades del equipo, informes, registro de casos de soporte Básico, respuestas rápidas y cotizador de tareas adicionales.
 
 **Stack:** Next.js 16 (App Router) · TypeScript · Tailwind CSS 4 · Postgres (Neon) · login con usuarios propios.
 
@@ -8,12 +8,14 @@ Herramienta interna para administrar la mesa de ayuda: registro de llamadas de e
 
 | Pestaña | Qué hace |
 |---|---|
-| **Resumen** | Indicadores: llamadas de hoy, abiertas, llamadas del mes, empresas que superaron las llamadas de su plan. Llamadas por empresa (hoy / mes contra lo incluido / abiertas), abiertas más antiguas y empresas por plan. |
-| **Llamadas** | Registrar llamadas (empresa, contacto, fecha/hora, motivo, estado, resolución). Filtros por empresa, estado y período, y cuenta de llamadas por empresa. Al elegir la empresa avisa si no tiene soporte o si ya usó las llamadas incluidas del mes. Guarda qué usuario registró cada llamada. |
+| **Resumen** | Novedades del equipo por mes (alta, edición y baja, navegando entre meses) e informes actualizados recientemente. |
+| **Soporte Básico** | Lista de empresas con soporte Básico y sus casos del mes. Registrar un caso: empresa + número de ticket (se puede pegar la URL) + fecha. El ticket abre `https://soporte.flexxus.com.ar/tickets/<número>`. Cada empresa tiene **5 casos por mes calendario**: al llegar, la app avisa "sin llamadas disponibles" y el sexto en adelante queda marcado como excedido. No permite repetir un ticket. |
 | **Respuestas rápidas** | Respuestas predefinidas con categorías, búsqueda (sin importar acentos), botón Copiar, alta, edición y baja. |
-| **Tareas adicionales** | Tabla de tareas con unidad y valor en pesos. Alta, edición, baja y ajuste masivo por porcentaje. |
-| **Planes y empresas** | Qué incluye cada tipo de soporte (horario, tiempo de respuesta, llamadas por mes, abono) y qué plan tiene cada empresa, con las llamadas usadas en el mes. |
+| **Cotizador** | Tareas cotizables con sus horas y valor hora por tipo de soporte. Se elige la tarea (o se cargan las horas) y el soporte contratado y muestra `horas × valor hora = total + IVA`, el IVA 21 % y el total con IVA, con botón para copiar la cotización. |
+| **Informes** | Notas de release, uso del sistema, procedimientos, etc. Texto con formato (títulos, listas, negritas, tablas, links) con vista previa, búsqueda y categorías. |
 | **Usuarios** | Solo administradores: alta de usuarios, rol (administrador u operador), activar/desactivar y cambio de contraseña. |
+
+El límite de casos (5) y el IVA (21 %) están en `src/lib/format.ts`.
 
 ## Correr en local
 
@@ -34,7 +36,9 @@ Abrí http://localhost:3000 e ingresá con `ADMIN_EMAIL` / `ADMIN_PASSWORD`. Si 
 
 **Base de datos local:** si `DATABASE_URL` está vacía se usa [PGlite](https://pglite.dev), un Postgres embebido que guarda los datos en `./.data/pglite`. No hay que instalar nada. Para empezar de cero, frená el servidor y borrá la carpeta `.data`.
 
-La primera vez que arranca con una base vacía, la aplicación crea las tablas, carga los **datos de ejemplo** (planes, 8 empresas ficticias, ~45 llamadas, respuestas y tareas) y el usuario administrador. Con `SEED_DEMO=false` crea las tablas vacías (solo el administrador).
+La primera vez que arranca, la aplicación crea las tablas y el usuario administrador, y carga las **15 empresas con soporte Básico**, los tipos de soporte con su valor hora y las tareas cotizables (estos dos últimos con valores de ejemplo para reemplazar). En una base nueva agrega además **datos de ejemplo** (respuestas, novedades, informes y algunos casos con tickets ficticios); con `SEED_DEMO=false` no se cargan.
+
+**Actualización de bases existentes:** la base guarda su versión de esquema (tabla `schema_version`). Al desplegar una versión nueva, las tablas que faltan se crean solas en el primer acceso. Las tablas de la versión 1 (`planes`, `empresas`, `llamadas`, `tareas`) quedan sin uso y no se borran; se pueden eliminar a mano cuando ya no hagan falta.
 
 ## Variables de entorno
 
@@ -80,7 +84,7 @@ src/
     auth.ts, session.ts  sesiones con cookie firmada (JWT) y contraseñas con bcrypt
   app/
     login/               pantalla de ingreso
-    (app)/               pestañas: resumen, llamadas, respuestas, tareas, planes, usuarios
+    (app)/               pestañas: resumen (novedades), soporte-basico, respuestas, cotizador, informes, usuarios
   components/            diálogo de formularios, botones, navegación
 ```
 

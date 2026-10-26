@@ -6,10 +6,10 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
   const usuario = await requireUsuario();
   const tabs = [
     { href: "/", label: "Resumen" },
-    { href: "/llamadas", label: "Llamadas" },
+    { href: "/soporte-basico", label: "Soporte Básico" },
     { href: "/respuestas", label: "Respuestas rápidas" },
-    { href: "/tareas", label: "Tareas adicionales" },
-    { href: "/planes", label: "Planes y empresas" },
+    { href: "/cotizador", label: "Cotizador" },
+    { href: "/informes", label: "Informes" },
     ...(usuario.rol === "admin" ? [{ href: "/usuarios", label: "Usuarios" }] : []),
   ];
 

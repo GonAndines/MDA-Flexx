@@ -1,8 +1,22 @@
+/** Casos por mes incluidos en el soporte Básico. */
+export const LIMITE_CASOS_MES = 5;
+
+export const IVA = 0.21;
+
+export function ticketUrl(ticket: string | number) {
+  return `https://soporte.flexxus.com.ar/tickets/${ticket}`;
+}
+
 const pesos = new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS", maximumFractionDigits: 2 });
 
 export function formatPesos(valor: number | string | null | undefined) {
   if (valor === null || valor === undefined || valor === "") return "—";
   return pesos.format(Number(valor));
+}
+
+export function formatHoras(horas: number) {
+  const h = Number(horas).toLocaleString("es-AR", { maximumFractionDigits: 2 });
+  return `${h} h${Number(horas) === 1 ? "" : "s"}`;
 }
 
 /** "2026-10-26T14:05" → "26/10/2026 14:05" */
@@ -17,13 +31,30 @@ export function ahoraArgentina() {
   return new Date(Date.now() - 3 * 3600_000).toISOString().slice(0, 16);
 }
 
-export const ESTADOS = {
-  pendiente: { label: "Pendiente", clase: "bg-amber-100 text-amber-800" },
-  en_curso: { label: "En curso", clase: "bg-blue-100 text-blue-800" },
-  resuelta: { label: "Resuelta", clase: "bg-emerald-100 text-emerald-800" },
-} as const;
+/** Mes actual de Argentina como "AAAA-MM". */
+export function mesActual() {
+  return ahoraArgentina().slice(0, 7);
+}
 
-export type Estado = keyof typeof ESTADOS;
+const MESES = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
+
+/** "2026-10" → "octubre 2026" */
+export function nombreMes(mes: string) {
+  const [a, m] = mes.split("-");
+  return `${MESES[Number(m) - 1]} ${a}`;
+}
+
+/** Suma `delta` meses a "AAAA-MM". */
+export function moverMes(mes: string, delta: number) {
+  const [a, m] = mes.split("-").map(Number);
+  const d = new Date(Date.UTC(a, m - 1 + delta, 1));
+  return d.toISOString().slice(0, 7);
+}
+
+/** Valida "AAAA-MM" (de la URL o un formulario); si no es válido devuelve el mes actual. */
+export function mesValido(v: string | undefined | null) {
+  return v && /^\d{4}-(0[1-9]|1[0-2])$/.test(v) ? v : mesActual();
+}
 
 export function texto(fd: FormData, campo: string) {
   return String(fd.get(campo) ?? "").trim();

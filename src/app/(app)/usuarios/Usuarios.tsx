@@ -3,7 +3,7 @@
 import { Field, FormDialog } from "@/components/FormDialog";
 import { crearUsuario, editarUsuario } from "./actions";
 
-export type UsuarioFila = { id: number; nombre: string; email: string; rol: "admin" | "operador"; activo: boolean; llamadas: number };
+export type UsuarioFila = { id: number; nombre: string; email: string; rol: "admin" | "operador"; activo: boolean; casos: number };
 
 function Campos({ u }: { u?: UsuarioFila }) {
   return (
@@ -38,7 +38,7 @@ export function Usuarios({ usuarios, yoId }: { usuarios: UsuarioFila[]; yoId: nu
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-xl font-semibold">Usuarios</h1>
-          <p className="text-sm text-slate-500">Los usuarios no se borran: se desactivan para conservar quién registró cada llamada.</p>
+          <p className="text-sm text-slate-500">Los usuarios no se borran: se desactivan para conservar quién registró cada caso.</p>
         </div>
         <FormDialog trigger="+ Nuevo usuario" triggerClassName="btn-primary" title="Nuevo usuario" action={crearUsuario}>
           <Campos />
@@ -51,7 +51,7 @@ export function Usuarios({ usuarios, yoId }: { usuarios: UsuarioFila[]; yoId: nu
               <th>Nombre</th>
               <th>Email</th>
               <th>Rol</th>
-              <th className="text-right">Llamadas registradas</th>
+              <th className="text-right">Casos registrados</th>
               <th />
             </tr>
           </thead>
@@ -65,7 +65,7 @@ export function Usuarios({ usuarios, yoId }: { usuarios: UsuarioFila[]; yoId: nu
                 </td>
                 <td>{u.email}</td>
                 <td>{u.rol === "admin" ? "Administrador" : "Operador"}</td>
-                <td className="text-right tabular-nums">{u.llamadas}</td>
+                <td className="text-right tabular-nums">{u.casos}</td>
                 <td className="text-right">
                   <FormDialog trigger="Editar" triggerClassName="btn-link" title="Editar usuario" action={editarUsuario.bind(null, u.id)}>
                     <Campos u={u} />
