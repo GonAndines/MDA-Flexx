@@ -8,7 +8,7 @@ Herramienta interna de la mesa de ayuda: derivador de la central, atención de l
 
 | Pestaña | Qué hace |
 |---|---|
-| **Resumen** | Pantalla principal: derivador IVR, atención de los sábados, novedades del mes, contactos de las áreas e informes recientes. Detalle en [Resumen](#resumen). |
+| **Resumen** | Pantalla principal: derivador IVR, atención de los sábados, novedades del mes, contraseñas, contactos de las áreas e informes recientes. Detalle en [Resumen](#resumen). |
 | **Soporte Básico** | Lista de empresas con soporte Básico y sus casos del mes. Registrar un caso: empresa + número de ticket (se puede pegar la URL) + fecha. El ticket abre `https://soporte.flexxus.com.ar/tickets/<número>`. Cada empresa tiene **5 casos por mes calendario**: al llegar, la app avisa "sin llamadas disponibles" y el sexto en adelante queda marcado como excedido. No permite repetir un ticket. |
 | **Respuestas rápidas** | Respuestas predefinidas con categorías, búsqueda (sin importar acentos), botón Copiar, alta, edición y baja. |
 | **Cotizador** | Tabla de tareas cotizables con lo que se cotiza según el soporte (horas, "–" no aplica, a cotizar o valor fijo) y dos tarifas sin IVA: *con soporte* (Premium, Básico, Por Casos, Order Advanced) y *sin soporte*. Se elige tarea, soporte contratado y modalidad: **remota** = horas × valor hora; **visita** = primera hora + horas restantes × su valor. Muestra total + IVA, IVA 21 % y total con IVA, con botón para copiar. Se pueden agregar y editar tareas y tarifas. |
@@ -43,6 +43,17 @@ El cupo por período está en `src/app/(app)/sabados-actions.ts` (`LIMITE_POR_TA
 
 Novedades del equipo agrupadas por mes, con flechas para navegar entre meses. Cualquier usuario puede agregar, editar y borrar.
 
+### Contraseñas
+
+Cada agente escribe el **usuario de Flexxus** (por ejemplo, ADMIN) y la app calcula las contraseñas del día, con la fecha de Argentina:
+
+- **Pass Flexxus vieja:** año + mes + día sumados, `!` y el usuario. El 27/10/2026 con ADMIN: `2063!ADMIN`.
+- **Pass Flexxus nueva:** año, `*`, mes + día sumados, `*` y el usuario. El 27/10/2026 con ADMIN: `2026*37*ADMIN`.
+
+Debajo están las contraseñas fijas (Firebird 2.5, Firebird 5). Todas tienen botón **Copiar**. El navegador recuerda el último usuario ingresado. Las fórmulas están en `src/app/(app)/Claves.tsx`.
+
+Las contraseñas fijas se guardan en la base, no en el código: el administrador las agrega, edita o borra desde el mismo cuadro (**+ Contraseña**).
+
 ### Contactos de las áreas
 
 WhatsApp, teléfonos, mails y otros datos de Soporte, Administración y demás áreas, agrupados por área. Cada dato se muestra como texto con un botón **Copiar**, para pasárselo al cliente; no abre WhatsApp ni el correo. Se agregan, editan y borran desde el mismo cuadro.
@@ -72,7 +83,7 @@ Abrí http://localhost:3000 e ingresá con `ADMIN_EMAIL` / `ADMIN_PASSWORD`. Si 
 
 La primera vez que arranca, la aplicación crea las tablas y el usuario administrador, y carga las **15 empresas con soporte Básico**, las tarifas, la tabla de tareas cotizables vigentes y el **cronograma de sábados** inicial. En una base nueva agrega además **datos de ejemplo** (respuestas, novedades, informes y algunos casos con tickets ficticios); con `SEED_DEMO=false` no se cargan.
 
-**Actualización de bases existentes:** la base guarda su versión de esquema (tabla `schema_version`, hoy versión 5). Al desplegar una versión nueva, las tablas que faltan se crean y se cargan solas en el primer acceso, sin tocar los datos existentes. Las tablas de la versión 1 (`planes`, `empresas`, `llamadas`, `tareas`) quedan sin uso y no se borran; se pueden eliminar a mano cuando ya no hagan falta.
+**Actualización de bases existentes:** la base guarda su versión de esquema (tabla `schema_version`, hoy versión 6). Al desplegar una versión nueva, las tablas que faltan se crean y se cargan solas en el primer acceso, sin tocar los datos existentes. Las tablas de la versión 1 (`planes`, `empresas`, `llamadas`, `tareas`) quedan sin uso y no se borran; se pueden eliminar a mano cuando ya no hagan falta.
 
 ## Variables de entorno
 
@@ -93,6 +104,7 @@ La primera vez que arranca, la aplicación crea las tablas y el usuario administ
 4. **Variables de entorno** (*Settings → Environment Variables*): `AUTH_SECRET`, `ADMIN_EMAIL`, `ADMIN_PASSWORD` y, si querés arrancar sin datos de ejemplo, `SEED_DEMO=false`.
 5. **Deploy.** En el primer acceso la aplicación crea las tablas y el administrador. Ingresá, cambiá la contraseña del admin y creá los usuarios del equipo (a mano o con el [alta masiva](#alta-masiva-de-usuarios)).
 6. **Sábados:** en *Resumen → Atención de los sábados → Agentes de los sábados*, vinculá los nombres que quedaron "Sin vincular" a su usuario.
+7. **Contraseñas:** en *Resumen → Contraseñas*, cargá las contraseñas fijas con **+ Contraseña**.
 
 Con la CLI, en lugar de los pasos 2 a 5:
 
@@ -190,3 +202,4 @@ Las horas se manejan en hora de Argentina (UTC−3).
 | 26/10/2026 | **Contactos de las áreas** en el Resumen, con botón Copiar. |
 | 27/10/2026 | **Atención de los sábados** en el Resumen, con el cronograma 2026 cargado, postulación de agentes (2 activos y 2 pasivos por período) y carga de nuevas fechas por el administrador. Todos los usuarios de la plataforma son agentes. |
 | 27/10/2026 | **Informes por categoría:** portada con una tarjeta por categoría y listado filtrado al entrar. Importación de los Cierres Funcionales de Vanessa Segura como **Notas de release** (`scripts/importar-informes.mjs`). |
+| 27/10/2026 | **Contraseñas** en el Resumen: Flexxus vieja y nueva calculadas con la fecha y el usuario ingresado, y contraseñas fijas (Firebird) que carga el administrador. Todas se copian con un botón. |

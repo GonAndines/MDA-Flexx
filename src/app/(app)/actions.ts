@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { requireUsuario } from "@/lib/auth";
+import { requireAdmin, requireUsuario } from "@/lib/auth";
 import { query } from "@/lib/db";
 import { texto } from "@/lib/format";
 
@@ -74,5 +74,51 @@ export async function editarContacto(id: number, fd: FormData) {
 export async function borrarContacto(id: number) {
   await requireUsuario();
   await query("delete from contactos where id = $1", [id]);
+  revalidatePath("/");
+}
+
+// Contraseñas fijas (Firebird, etc.). Las ve y copia cualquier usuario; solo el admin las cambia.
+
+function leerClave(fd: FormData) {
+  const nombre = texto(fd, "nombre");
+  const valor = texto(fd, "valor");
+  if (!nombre) return { error: "Indicá el nombre." } as const;
+  if (!valor) return { error: "Completá la contraseña." } as const;
+  return { datos: [nombre, valor] } as const;
+}
+
+function esDuplicado(e: unknown) {
+  return typeof e === "object" && e !== null && "code" in e && (e as { code: string }).code === "23505";
+}
+
+export async function crearClave(fd: FormData) {
+  await requireAdmin();
+  const r = leerClave(fd);
+  if ("error" in r) return r;
+  try {
+    await query("insert into claves (nombre, valor, orden) values ($1, $2, (select coalesce(max(orden), 0) + 1 from claves))", [...r.datos]);
+  } catch (e) {
+    if (esDuplicado(e)) return { error: "Ya existe una contraseña con ese nombre." };
+    throw e;
+  }
+  revalidatePath("/");
+}
+
+export async function editarClave(id: number, fd: FormData) {
+  await requireAdmin();
+  const r = leerClave(fd);
+  if ("error" in r) return r;
+  try {
+    await query("update claves set nombre = $2, valor = $3 where id = $1", [id, ...r.datos]);
+  } catch (e) {
+    if (esDuplicado(e)) return { error: "Ya existe una contraseña con ese nombre." };
+    throw e;
+  }
+  revalidatePath("/");
+}
+
+export async function borrarClave(id: number) {
+  await requireAdmin();
+  await query("delete from claves where id = $1", [id]);
   revalidatePath("/");
 }

@@ -4,6 +4,7 @@ import { sincronizarAgentes } from "@/lib/agentes";
 import { requireUsuario } from "@/lib/auth";
 import { AHORA_AR, query } from "@/lib/db";
 import { mesActual, mesValido, moverMes, nombreMes } from "@/lib/format";
+import { Claves, type Clave } from "./Claves";
 import { Contactos, type Contacto } from "./Contactos";
 import { ListaNovedades, NuevaNovedad, type Novedad } from "./Novedades";
 import { Sabados, type Agente, type Sabado } from "./Sabados";
@@ -19,7 +20,7 @@ export default async function ResumenPage({ searchParams }: PageProps<"/">) {
   const hoy = `(${AHORA_AR})::date`;
   await sincronizarAgentes();
 
-  const [novedades, informes, contactos, sabados, agentes, usuarios] = await Promise.all([
+  const [novedades, informes, contactos, sabados, agentes, usuarios, claves] = await Promise.all([
     query<Novedad>(
       `select n.id, to_char(n.mes, 'YYYY-MM') as mes, n.titulo, n.texto, u.nombre as autor,
               to_char(n.creado - interval '3 hours', 'DD/MM/YYYY') as creado
@@ -44,6 +45,7 @@ export default async function ResumenPage({ searchParams }: PageProps<"/">) {
        order by ag.activo and coalesce(u.activo, true) desc, ag.nombre`,
     ),
     esAdmin ? query<{ id: number; nombre: string }>("select id, nombre from usuarios where activo order by nombre") : [],
+    query<Clave>("select id, nombre, valor from claves order by orden, id"),
   ]);
   const miAgenteId = agentes.find((a) => a.usuario_id === usuario.id && a.activo)?.id ?? null;
 
@@ -77,6 +79,7 @@ export default async function ResumenPage({ searchParams }: PageProps<"/">) {
         </section>
 
         <aside className="space-y-6">
+          <Claves claves={claves} esAdmin={esAdmin} />
           <Contactos contactos={contactos} />
           <section className="card p-4">
             <div className="mb-3 flex items-center justify-between">
