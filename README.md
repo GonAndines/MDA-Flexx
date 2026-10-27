@@ -12,7 +12,7 @@ Herramienta interna de la mesa de ayuda: derivador de la central, atención de l
 | **Soporte Básico** | Lista de empresas con soporte Básico y sus casos del mes. Registrar un caso: empresa + número de ticket (se puede pegar la URL) + fecha. El ticket abre `https://soporte.flexxus.com.ar/tickets/<número>`. Cada empresa tiene **5 casos por mes calendario**: al llegar, la app avisa "sin llamadas disponibles" y el sexto en adelante queda marcado como excedido. No permite repetir un ticket. |
 | **Respuestas rápidas** | Respuestas predefinidas con categorías, búsqueda (sin importar acentos), botón Copiar, alta, edición y baja. |
 | **Cotizador** | Tabla de tareas cotizables con lo que se cotiza según el soporte (horas, "–" no aplica, a cotizar o valor fijo) y dos tarifas sin IVA: *con soporte* (Premium, Básico, Por Casos, Order Advanced) y *sin soporte*. Se elige tarea, soporte contratado y modalidad: **remota** = horas × valor hora; **visita** = primera hora + horas restantes × su valor. Muestra total + IVA, IVA 21 % y total con IVA, con botón para copiar. Se pueden agregar y editar tareas y tarifas. |
-| **Informes** | Notas de release, uso del sistema, procedimientos, etc. Texto con formato (títulos, listas, negritas, tablas, links) con vista previa, búsqueda y categorías. |
+| **Informes** | Notas de release, uso del sistema, procedimientos, etc., agrupados por **categoría**: la portada muestra una tarjeta por categoría con su cantidad, y al entrar se listan solo los de esa categoría, del más nuevo al más viejo. Búsqueda (sin importar acentos) dentro de la categoría o en todos. Texto con formato (títulos, listas, negritas, tablas, links) con vista previa. |
 | **Usuarios** | Solo administradores: alta de usuarios, rol (administrador u operador), activar/desactivar y cambio de contraseña. |
 | **Mi cuenta** | Desde el enlace "Mi cuenta" del encabezado, cada usuario cambia su propia contraseña (pide la actual). |
 
@@ -138,11 +138,23 @@ Los emails que ya existen se saltean, así que se puede volver a correr sin dupl
 
 Cada usuario nuevo queda como agente de los sábados la próxima vez que alguien abre el Resumen.
 
+## Importar informes
+
+`scripts/importar-informes.mjs` carga varios informes de una vez desde un JSON. Se usó para pasar a **Notas de release** los Cierres Funcionales que manda Vanessa Segura por mail (el contenido del Word adjunto, sin la parte técnica).
+
+```bat
+set "DATABASE_URL=postgresql://...pegá acá la cadena completa..."
+node scripts/importar-informes.mjs notas-release.json
+```
+
+El JSON es una lista de `{ "titulo", "contenido", "fecha": "AAAA-MM-DD", "categoria" }` (fecha y categoría son opcionales; la categoría por defecto es "Notas de release" o la que se pase como segundo argumento). La fecha queda como fecha del informe, así se ordenan como se publicaron. Los que ya existen (mismo título y categoría) se saltean, así que se puede volver a correr con mails nuevos sin duplicar. `notas-release.json` no se sube a git.
+
 ## Estructura
 
 ```
 scripts/
   crear-usuarios.mjs     alta masiva de usuarios desde CSV
+  importar-informes.mjs  carga de informes desde JSON
 src/
   proxy.ts               redirige al login si no hay sesión
   lib/
@@ -152,7 +164,7 @@ src/
     agentes.ts           vincula usuarios con agentes de los sábados
     ivr.ts               menú de la central telefónica
     format.ts            límite de casos, IVA, formatos de fecha y moneda
-    informes.ts          categorías y consulta de informes
+    informes.ts          categorías, consulta y búsqueda de informes
     auth.ts, session.ts  sesiones con cookie firmada (JWT) y contraseñas con bcrypt
   app/
     login/               pantalla de ingreso
@@ -177,3 +189,4 @@ Las horas se manejan en hora de Argentina (UTC−3).
 | 26/10/2026 | **Derivador IVR** de la central en el Resumen. |
 | 26/10/2026 | **Contactos de las áreas** en el Resumen, con botón Copiar. |
 | 27/10/2026 | **Atención de los sábados** en el Resumen, con el cronograma 2026 cargado, postulación de agentes (2 activos y 2 pasivos por período) y carga de nuevas fechas por el administrador. Todos los usuarios de la plataforma son agentes. |
+| 27/10/2026 | **Informes por categoría:** portada con una tarjeta por categoría y listado filtrado al entrar. Importación de los Cierres Funcionales de Vanessa Segura como **Notas de release** (`scripts/importar-informes.mjs`). |

@@ -48,3 +48,6 @@ next-env.d.ts
 # alta masiva de usuarios: listas y contraseñas temporales
 /usuarios.csv
 /usuarios-creados.csv
+
+# importación de informes: datos extraídos de los mails
+/notas-release.json

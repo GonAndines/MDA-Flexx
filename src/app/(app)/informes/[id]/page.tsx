@@ -5,7 +5,7 @@ import { FormDialog } from "@/components/FormDialog";
 import { Markdown } from "@/components/Markdown";
 import { query, queryOne } from "@/lib/db";
 import { borrarInforme, editarInforme } from "../actions";
-import { CATEGORIAS_SUGERIDAS, SELECT_INFORMES } from "@/lib/informes";
+import { CATEGORIAS_SUGERIDAS, SELECT_INFORMES, urlCategoria } from "@/lib/informes";
 import { CamposInforme, type Informe } from "../Informes";
 
 export default async function InformePage({ params }: PageProps<"/informes/[id]">) {
@@ -20,8 +20,8 @@ export default async function InformePage({ params }: PageProps<"/informes/[id]"
 
   return (
     <div className="mx-auto max-w-3xl space-y-4">
-      <Link href="/informes" className="btn-link -ml-2">
-        ‹ Informes
+      <Link href={urlCategoria(informe.categoria)} className="btn-link -ml-2">
+        ‹ {informe.categoria}
       </Link>
       <article className="card p-6">
         <div className="mb-4 flex flex-wrap items-start justify-between gap-3 border-b border-slate-100 pb-4">
