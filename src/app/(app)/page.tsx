@@ -1,9 +1,11 @@
 import Link from "next/link";
 import { Ivr } from "@/components/Ivr";
-import { query } from "@/lib/db";
+import { requireUsuario } from "@/lib/auth";
+import { AHORA_AR, query } from "@/lib/db";
 import { mesActual, mesValido, moverMes, nombreMes } from "@/lib/format";
 import { Contactos, type Contacto } from "./Contactos";
 import { ListaNovedades, NuevaNovedad, type Novedad } from "./Novedades";
+import { Sabados, type Agente, type Sabado } from "./Sabados";
 
 export const metadata = { title: "Resumen · Mesa de ayuda" };
 
@@ -11,7 +13,11 @@ export default async function ResumenPage({ searchParams }: PageProps<"/">) {
   const sp = await searchParams;
   const mes = mesValido(Array.isArray(sp.mes) ? sp.mes[0] : sp.mes);
 
-  const [novedades, informes, contactos] = await Promise.all([
+  const usuario = await requireUsuario();
+  const esAdmin = usuario.rol === "admin";
+  const hoy = `(${AHORA_AR})::date`;
+
+  const [novedades, informes, contactos, sabados, agentes, usuarios] = await Promise.all([
     query<Novedad>(
       `select n.id, to_char(n.mes, 'YYYY-MM') as mes, n.titulo, n.texto, u.nombre as autor,
               to_char(n.creado - interval '3 hours', 'DD/MM/YYYY') as creado
@@ -24,7 +30,19 @@ export default async function ResumenPage({ searchParams }: PageProps<"/">) {
        from informes order by informes.actualizado desc limit 6`,
     ),
     query<Contacto>("select id, area, tipo, valor, detalle from contactos order by area, id"),
+    query<Sabado>(
+      `select s.id, to_char(s.fecha, 'YYYY-MM-DD') as fecha, s.tanda, s.feriado, s.activa_id, s.pasiva_id,
+              a.nombre as activa, p.nombre as pasiva, s.fecha > ${hoy} as futuro, s.fecha >= ${hoy} as vigente
+       from sabados s left join agentes a on a.id = s.activa_id left join agentes p on p.id = s.pasiva_id
+       order by s.fecha`,
+    ),
+    query<Agente>(
+      `select ag.id, ag.nombre, ag.usuario_id, u.nombre as usuario, ag.activo
+       from agentes ag left join usuarios u on u.id = ag.usuario_id order by ag.activo desc, ag.nombre`,
+    ),
+    esAdmin ? query<{ id: number; nombre: string }>("select id, nombre from usuarios where activo order by nombre") : [],
   ]);
+  const miAgenteId = agentes.find((a) => a.usuario_id === usuario.id && a.activo)?.id ?? null;
 
   return (
     <div className="space-y-6">
@@ -32,6 +50,7 @@ export default async function ResumenPage({ searchParams }: PageProps<"/">) {
 
       <div className="grid gap-6 lg:grid-cols-[1fr_20rem]">
         <section className="space-y-4">
+          <Sabados sabados={sabados} agentes={agentes} usuarios={usuarios} miAgenteId={miAgenteId} esAdmin={esAdmin} />
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-2">
               <Link href={`/?mes=${moverMes(mes, -1)}`} className="btn" aria-label="Mes anterior">

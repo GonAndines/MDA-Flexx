@@ -54,6 +54,49 @@ const TAREAS: [string, Celda[]][] = [
 
 const MODO_CELDA = { "-": "no_aplica", C: "a_cotizar", F: "fijo" } as const;
 
+// Cronograma de atención de los sábados (Excel SABADOS.xlsx): fecha, agente activo, agente pasivo.
+const SABADOS: [string, string, string][] = [
+  ["2026-02-14", "Carol", ""],
+  ["2026-02-21", "Karen", "Gaston"],
+  ["2026-02-28", "Gaston", "Rodrigo"],
+  ["2026-03-07", "Karen", "Rodrigo"],
+  ["2026-03-14", "Rodrigo", "Agustin"],
+  ["2026-03-21", "Rodrigo", "Karen"],
+  ["2026-03-28", "Agustin", "Martin"],
+  ["2026-04-04", "Carol", "Karen"],
+  ["2026-04-11", "Martin", "Carol"],
+  ["2026-04-18", "Martin", "Carol"],
+  ["2026-04-25", "Gaston", "Agustin"],
+  ["2026-05-02", "Agustin", "Martin"],
+  ["2026-05-09", "Rodrigo", "Karen"],
+  ["2026-05-16", "Rodrigo", "Karen"],
+  ["2026-05-23", "Karen", "Rodrigo"],
+  ["2026-05-30", "Karen", "Rodrigo"],
+  ["2026-06-06", "Gaston", "Agustin"],
+  ["2026-06-13", "Carol", "Gaston"],
+  ["2026-06-20", "Feriado", "Feriado"],
+  ["2026-06-27", "Martin", "Carol"],
+  ["2026-07-04", "Agustin", "Martin"],
+  ["2026-07-11", "Agustin", "Gaston"],
+  ["2026-07-18", "Martin", "Carol"],
+  ["2026-07-25", "Gaston", "Agustin"],
+  ["2026-08-01", "Carol", "Martin"],
+  ["2026-08-08", "Rodrigo", "Carol"],
+  ["2026-08-15", "Gaston", "Agustin"],
+  ["2026-08-22", "Carol", "Gaston"],
+  ["2026-08-29", "Rodrigo", "TiTa"],
+  ["2026-09-05", "Gonzalo", "Rodrigo"],
+  ["2026-09-12", "Carol", "Agustin"],
+  ["2026-09-19", "TiTa", "Fer"],
+  ["2026-09-26", "Agustin", "TiTa"],
+  ["2026-10-03", "Fer", "Carol"],
+  ["2026-10-10", "Agustin", "Gaston"],
+  ["2026-10-17", "Gonzalo", "Rodrigo"],
+  ["2026-10-24", "TiTa", "Gonzalo"],
+  ["2026-10-31", "Fer", "Gonzalo"],
+  ["2026-11-07", "Gaston", "Fer"],
+];
+
 const RESPUESTAS: [string, string, string][] = [
   // título, categoría, texto
   ["Saludo inicial", "General", "¡Hola! Gracias por comunicarte con la mesa de ayuda. ¿En qué podemos ayudarte?"],
@@ -131,6 +174,18 @@ export async function seedBase(d: Driver) {
       });
     }
     await insertMany(d, "tarea_soporte", ["tarea_id", "tipo_id", "modo", "valor"], celdas);
+  }
+  if (await vacia(d, "sabados")) {
+    const nombres = [...new Set(SABADOS.flatMap(([, a, p]) => [a, p]))].filter((n) => n && n !== "Feriado");
+    if (await vacia(d, "agentes")) await insertMany(d, "agentes", ["nombre"], nombres.map((n) => [n]));
+    const agentes = await d.query("select id, nombre from agentes");
+    const id = (n: string) => agentes.find((a) => a.nombre === n)?.id ?? null;
+    await insertMany(
+      d,
+      "sabados",
+      ["fecha", "tanda", "feriado", "activa_id", "pasiva_id"],
+      SABADOS.map(([fecha, a, p]) => [fecha, 1, a === "Feriado", id(a), id(p)]),
+    );
   }
 }
 

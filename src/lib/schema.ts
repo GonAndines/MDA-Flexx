@@ -6,9 +6,9 @@ import { seedBase, seedDemo } from "./seed";
  * Versión del esquema. La 1 tenía planes, empresas, llamadas y tareas con valor;
  * esas tablas quedan sin uso en las bases que ya existían (no se borran).
  * La 2 tenía tipos_soporte y tareas_cotizables con valores de ejemplo: la 3 las reemplaza.
- * La 4 agrega contactos.
+ * La 4 agrega contactos. La 5 agrega la atención de los sábados.
  */
-const VERSION = 4;
+const VERSION = 5;
 
 const DDL = [
   `create table if not exists usuarios (
@@ -97,6 +97,23 @@ const DDL = [
     tipo text not null check (tipo in ('whatsapp', 'telefono', 'email', 'otro')),
     valor text not null,
     detalle text not null default ''
+  )`,
+  // Atención de los sábados. Un agente puede estar vinculado a un usuario para postularse solo.
+  `create table if not exists agentes (
+    id serial primary key,
+    nombre text not null unique,
+    usuario_id int unique references usuarios(id) on delete set null,
+    activo boolean not null default true
+  )`,
+  // `tanda` agrupa las fechas que agregó el admin de una vez: el límite de postulaciones cuenta por tanda.
+  `create table if not exists sabados (
+    id serial primary key,
+    fecha date not null unique,
+    tanda int not null,
+    feriado boolean not null default false,
+    activa_id int references agentes(id) on delete set null,
+    pasiva_id int references agentes(id) on delete set null,
+    check (activa_id is null or pasiva_id is null or activa_id <> pasiva_id)
   )`,
   `create table if not exists schema_version (version int not null)`,
 ];
