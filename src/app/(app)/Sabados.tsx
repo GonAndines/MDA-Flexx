@@ -101,10 +101,10 @@ function CamposSabado({ s, agentes }: { s: Sabado; agentes: Agente[] }) {
 function CamposAgente({ a, usuarios }: { a?: Agente; usuarios: { id: number; nombre: string }[] }) {
   return (
     <>
-      <Field label="Nombre (como figura en el cronograma)">
+      <Field label="Nombre que se muestra en el cronograma">
         <input name="nombre" defaultValue={a?.nombre} required className="input" />
       </Field>
-      <Field label="Usuario de la app (para que se postule solo)">
+      <Field label="Usuario de la plataforma">
         <select name="usuario_id" defaultValue={a?.usuario_id ?? ""} className="input">
           <option value="">— Sin vincular —</option>
           {usuarios.map((u) => (
@@ -191,8 +191,8 @@ export function Sabados({
           Tus sábados en el período actual: activa {usados(tandaActual, "activa")}/{LIMITE} · pasiva {usados(tandaActual, "pasiva")}/{LIMITE}
         </p>
       )}
-      {!miAgenteId && !esAdmin && (
-        <p className="mb-2 text-xs text-slate-500">Para postularte, un administrador tiene que vincular tu usuario a un agente.</p>
+      {!miAgenteId && (
+        <p className="mb-2 text-xs text-slate-500">Tu usuario no figura como agente activo de los sábados.</p>
       )}
 
       <div className="overflow-x-auto">
@@ -236,6 +236,10 @@ export function Sabados({
       {esAdmin && (
         <details className="mt-4 border-t border-slate-100 pt-3">
           <summary className="cursor-pointer text-sm font-medium text-slate-700">Agentes de los sábados ({agentes.length})</summary>
+          <p className="mt-2 text-xs text-slate-500">
+            Cada usuario de la plataforma es agente automáticamente. Si su primer nombre coincide con un nombre del cronograma anterior, se
+            vincula solo; si no (por ejemplo, un apodo), editá ese nombre y elegí el usuario. Los nombres sin usuario no pueden postularse.
+          </p>
           <div className="mt-2 flex justify-end">
             <FormDialog trigger="+ Agente" title="Nuevo agente" action={crearAgente}>
               <CamposAgente usuarios={usuarios} />

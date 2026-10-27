@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Ivr } from "@/components/Ivr";
+import { sincronizarAgentes } from "@/lib/agentes";
 import { requireUsuario } from "@/lib/auth";
 import { AHORA_AR, query } from "@/lib/db";
 import { mesActual, mesValido, moverMes, nombreMes } from "@/lib/format";
@@ -16,6 +17,7 @@ export default async function ResumenPage({ searchParams }: PageProps<"/">) {
   const usuario = await requireUsuario();
   const esAdmin = usuario.rol === "admin";
   const hoy = `(${AHORA_AR})::date`;
+  await sincronizarAgentes();
 
   const [novedades, informes, contactos, sabados, agentes, usuarios] = await Promise.all([
     query<Novedad>(
@@ -37,8 +39,9 @@ export default async function ResumenPage({ searchParams }: PageProps<"/">) {
        order by s.fecha`,
     ),
     query<Agente>(
-      `select ag.id, ag.nombre, ag.usuario_id, u.nombre as usuario, ag.activo
-       from agentes ag left join usuarios u on u.id = ag.usuario_id order by ag.activo desc, ag.nombre`,
+      `select ag.id, ag.nombre, ag.usuario_id, u.nombre as usuario, ag.activo and coalesce(u.activo, true) as activo
+       from agentes ag left join usuarios u on u.id = ag.usuario_id
+       order by ag.activo and coalesce(u.activo, true) desc, ag.nombre`,
     ),
     esAdmin ? query<{ id: number; nombre: string }>("select id, nombre from usuarios where activo order by nombre") : [],
   ]);

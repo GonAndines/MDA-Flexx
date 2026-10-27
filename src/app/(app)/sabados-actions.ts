@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { requireAdmin, requireUsuario } from "@/lib/auth";
+import { sincronizarAgentes } from "@/lib/agentes";
 import { AHORA_AR, query, queryOne } from "@/lib/db";
 import { numero, texto } from "@/lib/format";
 
@@ -20,7 +21,12 @@ function columnas(rol: Rol) {
 }
 
 async function miAgente(usuarioId: number) {
-  return queryOne<{ id: number; nombre: string }>("select id, nombre from agentes where usuario_id = $1 and activo", [usuarioId]);
+  const buscar = () =>
+    queryOne<{ id: number; nombre: string }>("select id, nombre from agentes where usuario_id = $1 and activo", [usuarioId]);
+  const agente = await buscar();
+  if (agente) return agente;
+  await sincronizarAgentes();
+  return buscar();
 }
 
 // ---- Agente: postularse y liberar ----
@@ -28,7 +34,7 @@ async function miAgente(usuarioId: number) {
 export async function postularme(sabadoId: number, rol: Rol) {
   const usuario = await requireUsuario();
   const agente = await miAgente(usuario.id);
-  if (!agente) return { error: "Tu usuario no está vinculado a ningún agente. Pedíselo a un administrador." };
+  if (!agente) return { error: "Tu usuario no figura como agente activo de los sábados. Consultalo con un administrador." };
   const { col, otra } = columnas(rol);
 
   const s = await queryOne<{ tanda: number; feriado: boolean; futuro: boolean; ocupado: boolean; otra: number | null }>(
@@ -58,7 +64,7 @@ export async function postularme(sabadoId: number, rol: Rol) {
 export async function liberar(sabadoId: number, rol: Rol) {
   const usuario = await requireUsuario();
   const agente = await miAgente(usuario.id);
-  if (!agente) return { error: "Tu usuario no está vinculado a ningún agente." };
+  if (!agente) return { error: "Tu usuario no figura como agente activo de los sábados." };
   const { col } = columnas(rol);
   const ok = await queryOne(`update sabados set ${col} = null where id = $1 and ${col} = $2 and fecha > ${HOY} returning id`, [
     sabadoId,
@@ -117,14 +123,30 @@ function leerAgente(fd: FormData) {
   return { nombre, usuario: Number(texto(fd, "usuario_id")) || null } as const;
 }
 
+/**
+ * Un usuario tiene un solo agente. Si se lo vincula a otro (por ejemplo, al nombre que figuraba en el Excel),
+ * se suelta del anterior; si ese anterior no tiene ningún sábado, se borra.
+ */
+async function soltarUsuario(usuarioId: number | null, exceptoId = 0) {
+  if (!usuarioId) return;
+  await query("update agentes set usuario_id = null where usuario_id = $1 and id <> $2", [usuarioId, exceptoId]);
+  await query(
+    `delete from agentes a where a.usuario_id is null and a.id <> $1
+       and not exists (select 1 from sabados s where s.activa_id = a.id or s.pasiva_id = a.id)
+       and a.nombre = (select nombre from usuarios where id = $2)`,
+    [exceptoId, usuarioId],
+  );
+}
+
 export async function crearAgente(fd: FormData) {
   await requireAdmin();
   const r = leerAgente(fd);
   if ("error" in r) return r;
+  await soltarUsuario(r.usuario);
   try {
     await query("insert into agentes (nombre, usuario_id) values ($1, $2)", [r.nombre, r.usuario]);
   } catch (e) {
-    if (esDuplicado(e)) return { error: "Ya existe ese agente, o el usuario ya está vinculado a otro agente." };
+    if (esDuplicado(e)) return { error: "Ya existe un agente con ese nombre." };
     throw e;
   }
   refrescar();
@@ -134,6 +156,7 @@ export async function editarAgente(id: number, fd: FormData) {
   await requireAdmin();
   const r = leerAgente(fd);
   if ("error" in r) return r;
+  await soltarUsuario(r.usuario, id);
   try {
     await query("update agentes set nombre = $2, usuario_id = $3, activo = $4 where id = $1", [
       id,
@@ -142,7 +165,7 @@ export async function editarAgente(id: number, fd: FormData) {
       fd.get("activo") === "on",
     ]);
   } catch (e) {
-    if (esDuplicado(e)) return { error: "Ya existe ese nombre, o el usuario ya está vinculado a otro agente." };
+    if (esDuplicado(e)) return { error: "Ya existe un agente con ese nombre." };
     throw e;
   }
   refrescar();
