@@ -67,7 +67,7 @@ export function Respuestas({ respuestas }: { respuestas: Respuesta[] }) {
               type="button"
               onClick={() => setCategoria(c)}
               className={`rounded-full px-3 py-1 text-sm ${
-                categoria === c ? "bg-blue-600 text-white" : "bg-white text-slate-600 ring-1 ring-slate-200 hover:bg-slate-50"
+                categoria === c ? "bg-blue-600 text-white" : "bg-surface text-slate-600 ring-1 ring-slate-200 hover:bg-slate-50"
               }`}
             >
               {c || "Todas"}

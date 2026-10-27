@@ -5,20 +5,86 @@
   --font-mono: var(--font-geist-mono);
 }
 
+/* Fondo de tarjetas, campos y diálogos (bg-surface) y de la página: cambian con el tema. */
+@theme {
+  --color-surface: #fff;
+  --color-page: #f6f7f9;
+  --color-ink: #1f2937;
+}
+
 body {
-  background: #f6f7f9;
-  color: #1f2937;
+  background: var(--color-page);
+  color: var(--color-ink);
+}
+
+/*
+ * Modo oscuro (elegido por cada usuario con el botón del encabezado; queda en la cookie "tema").
+ * En lugar de duplicar clases, se redefine la paleta: los grises se invierten (los claros pasan a ser
+ * fondos oscuros y los oscuros, texto claro) y los colores de acento usan tintes oscuros de fondo y
+ * tonos claros de texto. El azul de los botones (600) y el texto sobre él (100) no cambian.
+ */
+:root[data-theme="oscuro"] {
+  color-scheme: dark;
+  --color-surface: #161f30;
+  --color-page: #0d1422;
+  --color-ink: #d5dce6;
+
+  --color-slate-50: #1c2639;
+  --color-slate-100: #222d42;
+  --color-slate-200: #2e3a50;
+  --color-slate-300: #415069;
+  --color-slate-400: #7d8ba1;
+  --color-slate-500: #98a5b8;
+  --color-slate-600: #aeb9c8;
+  --color-slate-700: #c3ccd8;
+  --color-slate-800: #d5dce6;
+  --color-slate-900: #e4e9f0;
+
+  --color-blue-50: #172a4d;
+  --color-blue-200: #1f3d75;
+  --color-blue-300: #3b6fd4;
+  --color-blue-700: #8ab4f8;
+  --color-blue-800: #a9c7fa;
+  --color-blue-900: #c6dafc;
+
+  --color-red-50: #3a1820;
+  --color-red-100: #4d1f28;
+  --color-red-300: #8c2f3c;
+  --color-red-600: #f28b82;
+  --color-red-700: #f6a59e;
+  --color-red-800: #f9c1bc;
+
+  --color-emerald-50: #0f2e26;
+  --color-emerald-100: #134236;
+  --color-emerald-300: #1f7a5f;
+  --color-emerald-700: #6fd6ad;
+  --color-emerald-800: #9de3c6;
+
+  --color-amber-50: #33270c;
+  --color-amber-100: #463510;
+  --color-amber-700: #f2c55c;
+  --color-amber-800: #f6d68a;
+}
+
+/* hover:bg-blue-700 de los botones principales: en oscuro el 700 es un texto claro, así que se oscurece aparte. */
+/* Y los links (texto blue-600) pasan al tono claro para que se lean sobre fondo oscuro. */
+:root[data-theme="oscuro"] .btn-primary:hover {
+  background-color: #1d4ed8;
+}
+:root[data-theme="oscuro"] .btn-link,
+:root[data-theme="oscuro"] .text-blue-600 {
+  color: var(--color-blue-700);
 }
 
 @layer components {
   .input {
-    @apply w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100;
+    @apply w-full rounded-md border border-slate-300 bg-surface px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/25;
   }
   .label {
     @apply mb-1 block text-xs font-medium text-slate-600;
   }
   .btn {
-    @apply inline-flex items-center justify-center gap-1 rounded-md border border-slate-300 bg-white px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50;
+    @apply inline-flex items-center justify-center gap-1 rounded-md border border-slate-300 bg-surface px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50;
   }
   .btn-primary {
     @apply inline-flex items-center justify-center gap-1 rounded-md bg-blue-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50;
@@ -30,7 +96,7 @@ body {
     @apply rounded-md px-2 py-1 text-sm font-medium text-blue-600 hover:bg-blue-50;
   }
   .card {
-    @apply rounded-xl border border-slate-200 bg-white shadow-sm;
+    @apply rounded-xl border border-slate-200 bg-surface shadow-sm;
   }
   .table {
     @apply w-full text-left text-sm;

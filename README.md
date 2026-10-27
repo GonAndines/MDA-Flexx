@@ -15,6 +15,7 @@ Herramienta interna de la mesa de ayuda: derivador de la central, atención de l
 | **Informes** | Notas de release, uso del sistema, procedimientos, etc., agrupados por **categoría**: la portada muestra una tarjeta por categoría con su cantidad, y al entrar se listan solo los de esa categoría, del más nuevo al más viejo. Búsqueda (sin importar acentos) dentro de la categoría o en todos. Texto con formato (títulos, listas, negritas, tablas, links) con vista previa. |
 | **Usuarios** | Solo administradores: alta de usuarios, rol (administrador u operador), activar/desactivar y cambio de contraseña. |
 | **Mi cuenta** | Desde el enlace "Mi cuenta" del encabezado, cada usuario cambia su propia contraseña (pide la actual). |
+| **Modo oscuro** | El botón **☾ Modo oscuro / ☀ Modo claro** del encabezado cambia el tema de toda la plataforma. Cada usuario elige el suyo y queda guardado en su navegador (cookie `tema`). |
 
 El límite de casos (5) y el IVA (21 %) están en `src/lib/format.ts`.
 
@@ -203,3 +204,4 @@ Las horas se manejan en hora de Argentina (UTC−3).
 | 27/10/2026 | **Atención de los sábados** en el Resumen, con el cronograma 2026 cargado, postulación de agentes (2 activos y 2 pasivos por período) y carga de nuevas fechas por el administrador. Todos los usuarios de la plataforma son agentes. |
 | 27/10/2026 | **Informes por categoría:** portada con una tarjeta por categoría y listado filtrado al entrar. Importación de los Cierres Funcionales de Vanessa Segura como **Notas de release** (`scripts/importar-informes.mjs`). |
 | 27/10/2026 | **Contraseñas** en el Resumen: Flexxus vieja y nueva calculadas con la fecha y el usuario ingresado, y contraseñas fijas (Firebird) que carga el administrador. Todas se copian con un botón. |
+| 27/10/2026 | **Modo oscuro** opcional, con un botón en el encabezado. Se recuerda por navegador. |

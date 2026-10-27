@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { Nav } from "@/components/Nav";
+import { BotonTema } from "@/components/Tema";
 import { requireUsuario } from "@/lib/auth";
+import { leerTema } from "@/lib/tema";
 import { logout } from "../login/actions";
 
 export default async function AppLayout({ children }: LayoutProps<"/">) {
@@ -16,11 +18,12 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
 
   return (
     <>
-      <header className="border-b border-slate-200 bg-white">
+      <header className="border-b border-slate-200 bg-surface">
         <div className="mx-auto max-w-7xl px-4">
           <div className="flex items-center justify-between gap-4 pt-3">
             <span className="font-semibold text-slate-800">Mesa de ayuda</span>
             <div className="flex items-center gap-3 text-sm text-slate-500">
+              <BotonTema inicial={await leerTema()} />
               <Link href="/cuenta" className="hover:text-slate-800 hover:underline" title="Mi cuenta: cambiar contraseña">
                 <span className="hidden sm:inline">{usuario.nombre} · </span>Mi cuenta
               </Link>

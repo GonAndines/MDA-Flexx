@@ -62,12 +62,12 @@ export function Ivr() {
                           ? "border-blue-600 bg-blue-600 text-white"
                           : enCamino
                             ? "border-blue-300 bg-blue-50 text-blue-900"
-                            : "border-slate-200 bg-white text-slate-700 hover:border-blue-300 hover:bg-slate-50"
+                            : "border-slate-200 bg-surface text-slate-700 hover:border-blue-300 hover:bg-slate-50"
                       }`}
                     >
                       <span
                         className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-bold ${
-                          actual ? "bg-white text-blue-700" : "bg-slate-100 text-slate-700"
+                          actual ? "bg-surface text-blue-700" : "bg-slate-100 text-slate-700"
                         }`}
                       >
                         {o.n}

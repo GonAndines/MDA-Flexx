@@ -43,7 +43,7 @@ export function FormDialog({
       </button>
       <dialog
         ref={dialog}
-        className={`m-auto w-[calc(100%-2rem)] rounded-xl p-0 text-left shadow-2xl backdrop:bg-slate-900/40 ${wide ? "max-w-2xl" : "max-w-lg"}`}
+        className={`m-auto w-[calc(100%-2rem)] rounded-xl bg-surface p-0 text-left text-[inherit] shadow-2xl backdrop:bg-black/50 ${wide ? "max-w-2xl" : "max-w-lg"}`}
       >
         <form
           onSubmit={(e) => {
