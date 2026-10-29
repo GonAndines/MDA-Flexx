@@ -32,19 +32,19 @@ export function Ivr() {
   const elegido = sel.length ? buscar(sel) : undefined;
 
   return (
-    <section className="card p-4">
+    <section>
       <div className="mb-3 flex flex-wrap items-baseline justify-between gap-2">
-        <h2 className="font-semibold">Derivador de la central telefónica</h2>
+        <h2 className="titulo">Derivador de la central telefónica</h2>
         <span className="text-sm text-slate-500">
           Central <strong className="text-slate-700">{CENTRAL.telefono}</strong> · interno{" "}
           <strong className="text-slate-700">{CENTRAL.interno}</strong>
         </span>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-[repeat(3,minmax(0,1fr))] xl:grid-cols-[repeat(3,minmax(0,1fr))_15rem]">
+      <div className="grid gap-4 md:grid-cols-[repeat(3,minmax(0,1fr))] 2xl:grid-cols-[repeat(3,minmax(0,1fr))_14rem]">
         {COLUMNAS.map((col) => (
           <div key={col.ruta.join("-") || "raiz"}>
-            <div className="mb-2 text-xs font-semibold tracking-wide text-slate-500 uppercase">
+            <div className="rotulo mb-2">
               {col.ruta.length ? `${col.ruta.join("-")} · ${col.titulo}` : col.titulo}
             </div>
             <ul className="space-y-1.5">
@@ -88,11 +88,11 @@ export function Ivr() {
           </div>
         ))}
 
-        <div className="flex flex-col items-center justify-center rounded-lg bg-slate-50 p-4 text-center md:col-span-3 xl:col-span-1">
+        <div className="flex flex-col items-center justify-center rounded-[10px] border border-dashed border-slate-300 p-4 text-center md:col-span-3 2xl:col-span-1">
           {elegido ? (
             <>
-              <div className="text-xs font-semibold tracking-wide text-slate-500 uppercase">Para derivar a</div>
-              <div className="mt-1 font-semibold text-slate-900">{elegido.nombre}</div>
+              <div className="rotulo">Para derivar a</div>
+              <div className="mt-1 font-bold text-slate-900">{elegido.nombre}</div>
               <div className="mt-2 flex items-center gap-1.5" aria-label={`Marcar ${sel.join(", ")}`}>
                 {sel.map((n, i) => (
                   <span key={i} className="flex items-center gap-1.5">

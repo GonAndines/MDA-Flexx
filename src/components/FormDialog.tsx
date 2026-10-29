@@ -57,7 +57,7 @@ export function FormDialog({
           }}
         >
           <div className="border-b border-slate-200 px-5 py-3">
-            <h2 className="font-semibold text-slate-800">{title}</h2>
+            <h2 className="font-bold text-slate-900">{title}</h2>
           </div>
           <div key={apertura} className="max-h-[70vh] space-y-3 overflow-y-auto px-5 py-4">
             {apertura > 0 && children}

@@ -47,13 +47,15 @@ export function CopyButton({ text }: { text: string }) {
   return (
     <button
       type="button"
-      className={estado === "ok" ? "btn border-emerald-300 text-emerald-700" : estado === "error" ? "btn border-red-300 text-red-700" : "btn"}
+      className={`btn ${
+        estado === "ok" ? "border-blue-600 bg-blue-600 text-white hover:bg-blue-600" : estado === "error" ? "border-red-300 text-red-700" : ""
+      }`}
       onClick={async () => {
         setEstado((await copiar(text)) ? "ok" : "error");
         setTimeout(() => setEstado(""), 1500);
       }}
     >
-      {estado === "ok" ? "¡Copiado!" : estado === "error" ? "No se pudo copiar" : "Copiar"}
+      {estado === "ok" ? "Copiado" : estado === "error" ? "No se pudo copiar" : "Copiar"}
     </button>
   );
 }

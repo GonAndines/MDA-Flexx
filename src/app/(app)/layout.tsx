@@ -16,28 +16,44 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
     ...(usuario.rol === "admin" ? [{ href: "/usuarios", label: "Usuarios" }] : []),
   ];
 
+  // Barra lateral fija en pantallas anchas; en el celular queda arriba, con las pestañas en una tira.
   return (
-    <>
-      <header className="border-b border-slate-200 bg-surface">
-        <div className="mx-auto max-w-7xl px-4">
-          <div className="flex items-center justify-between gap-4 pt-3">
-            <span className="font-semibold text-slate-800">Mesa de ayuda</span>
-            <div className="flex items-center gap-3 text-sm text-slate-500">
-              <BotonTema inicial={await leerTema()} />
-              <Link href="/cuenta" className="hover:text-slate-800 hover:underline" title="Mi cuenta: cambiar contraseña">
-                <span className="hidden sm:inline">{usuario.nombre} · </span>Mi cuenta
-              </Link>
-              <form action={logout}>
-                <button type="submit" className="btn-link">
-                  Salir
-                </button>
-              </form>
-            </div>
+    <div className="flex flex-1 flex-col lg:flex-row">
+      <aside className="border-b border-slate-200 bg-surface lg:sticky lg:top-0 lg:flex lg:h-screen lg:w-56 lg:shrink-0 lg:flex-col lg:border-r lg:border-b-0">
+        <div className="flex items-center justify-between gap-3 px-4 pt-3 lg:px-5 lg:pt-6 lg:pb-5">
+          <Link href="/" className="text-lg leading-tight font-bold whitespace-nowrap text-slate-900">
+            Mesa de ayuda
+          </Link>
+          <div className="flex items-center text-sm whitespace-nowrap lg:hidden">
+            <BotonTema inicial={await leerTema()} />
+            <Link href="/cuenta" className="btn-link">
+              Mi cuenta
+            </Link>
+            <form action={logout}>
+              <button type="submit" className="btn-link">
+                Salir
+              </button>
+            </form>
           </div>
-          <Nav tabs={tabs} />
         </div>
-      </header>
-      <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-6">{children}</main>
-    </>
+        <Nav tabs={tabs} />
+        <div className="mt-auto hidden space-y-1 border-t border-slate-200 px-3 py-4 text-sm lg:block">
+          <div className="truncate px-2 pb-1 font-bold text-slate-700">{usuario.nombre}</div>
+          <Link href="/cuenta" className="block rounded-md px-2 py-1 text-slate-600 hover:bg-slate-50 hover:text-slate-900" title="Cambiar mi contraseña">
+            Mi cuenta
+          </Link>
+          <BotonTema
+            inicial={await leerTema()}
+            className="block w-full rounded-md px-2 py-1 text-left text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+          />
+          <form action={logout}>
+            <button type="submit" className="w-full rounded-md px-2 py-1 text-left text-slate-600 hover:bg-slate-50 hover:text-slate-900">
+              Salir
+            </button>
+          </form>
+        </div>
+      </aside>
+      <main className="w-full max-w-[90rem] min-w-0 flex-1 px-4 py-6 lg:px-8 lg:py-8">{children}</main>
+    </div>
   );
 }

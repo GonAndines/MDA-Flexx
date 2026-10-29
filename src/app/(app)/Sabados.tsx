@@ -58,7 +58,7 @@ function Celda({ s, rol, miAgenteId, conCupo }: { s: Sabado; rol: Rol; miAgenteI
     const mio = id === miAgenteId;
     return (
       <span className="flex flex-wrap items-center gap-1">
-        <span className={mio ? "font-semibold text-blue-800" : ""}>
+        <span className={mio ? "font-bold text-blue-800" : ""}>
           {nombre}
           {mio && " (vos)"}
         </span>
@@ -152,9 +152,9 @@ export function Sabados({
   );
 
   return (
-    <section className="card p-4">
+    <section>
       <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-        <h2 className="font-semibold">Atención de los sábados</h2>
+        <h2 className="titulo">Atención de los sábados</h2>
         {esAdmin && (
           <FormDialog trigger="+ Agregar fechas" triggerClassName="btn" title="Agregar sábados" action={agregarFechas} submitLabel="Agregar">
             <p className="text-sm text-slate-600">
@@ -169,8 +169,8 @@ export function Sabados({
       </div>
 
       {proximo ? (
-        <div className="mb-4 rounded-lg border border-blue-200 bg-blue-50 p-3">
-          <div className="text-xs font-semibold tracking-wide text-blue-700 uppercase">Próximo sábado · {fecha(proximo.fecha)}</div>
+        <div className="mb-4 rounded-[10px] border-l-4 border-amber-600 bg-amber-50 px-4 py-3">
+          <div className="text-[13px] font-bold text-amber-800">Próximo sábado, {fecha(proximo.fecha)}</div>
           <div className="mt-1 flex flex-wrap gap-x-6 gap-y-1 text-sm">
             <span>
               Activa: <strong className="text-slate-900">{proximo.activa ?? "sin asignar"}</strong>
@@ -195,7 +195,7 @@ export function Sabados({
         <p className="mb-2 text-xs text-slate-500">Tu usuario no figura como agente activo de los sábados.</p>
       )}
 
-      <div className="overflow-x-auto">
+      <div className="card overflow-x-auto">
         <table className="table">
           <thead>
             <tr>
@@ -207,10 +207,10 @@ export function Sabados({
           </thead>
           <tbody>
             {visibles.map((s) => (
-              <tr key={s.id} className={s.id === proximo?.id ? "bg-blue-50/70" : !s.vigente ? "text-slate-500" : ""}>
+              <tr key={s.id} className={s.id === proximo?.id ? "bg-amber-50/70" : !s.vigente ? "text-slate-500" : ""}>
                 <td className="whitespace-nowrap tabular-nums">
                   {fecha(s.fecha)}
-                  {s.id === proximo?.id && <span className="ml-2 rounded bg-blue-600 px-1.5 py-0.5 text-[11px] text-white">Próximo</span>}
+                  {s.id === proximo?.id && <span className="ml-2 rounded-full bg-amber-100 px-2 py-0.5 text-xs font-bold text-amber-800">Próximo</span>}
                 </td>
                 <td>{celda(s, "activa")}</td>
                 <td>{celda(s, "pasiva")}</td>
@@ -234,7 +234,7 @@ export function Sabados({
       )}
 
       {esAdmin && (
-        <details className="mt-4 border-t border-slate-100 pt-3">
+        <details className="mt-4">
           <summary className="cursor-pointer text-sm font-medium text-slate-700">Agentes de los sábados ({agentes.length})</summary>
           <p className="mt-2 text-xs text-slate-500">
             Cada usuario de la plataforma es agente automáticamente. Si su primer nombre coincide con un nombre del cronograma anterior, se

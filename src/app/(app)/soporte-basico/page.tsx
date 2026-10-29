@@ -51,7 +51,7 @@ export default async function SoporteBasicoPage({ searchParams }: PageProps<"/so
       <section className="space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h1 className="text-xl font-semibold">Soporte Básico</h1>
+            <h1 className="titulo-pagina">Soporte Básico</h1>
             <p className="text-sm text-slate-500">
               Cada empresa tiene {LIMITE_CASOS_MES} casos incluidos por mes calendario.
             </p>
@@ -67,7 +67,7 @@ export default async function SoporteBasicoPage({ searchParams }: PageProps<"/so
             <Link href={qs({ mes: moverMes(mes, -1) })} className="btn" aria-label="Mes anterior">
               ‹
             </Link>
-            <h2 className="min-w-44 text-center text-lg font-semibold">
+            <h2 className="min-w-44 text-center text-lg font-bold">
               Casos de <span className="capitalize">{nombreMes(mes)}</span>
             </h2>
             <Link href={qs({ mes: moverMes(mes, 1) })} className="btn" aria-label="Mes siguiente">

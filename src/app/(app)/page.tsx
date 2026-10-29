@@ -49,22 +49,24 @@ export default async function ResumenPage({ searchParams }: PageProps<"/">) {
   ]);
   const miAgenteId = agentes.find((a) => a.usuario_id === usuario.id && a.activo)?.id ?? null;
 
+  // Columna principal con lo que se consulta; a la derecha, fijo al scrollear, lo que se copia (contraseñas y contactos).
   return (
-    <div className="space-y-6">
-      <Ivr />
+    <div className="grid items-start gap-8 xl:grid-cols-[minmax(0,1fr)_21rem]">
+      <div className="min-w-0 space-y-8">
+        <h1 className="titulo-pagina">Resumen</h1>
+        <Ivr />
+        <Sabados sabados={sabados} agentes={agentes} usuarios={usuarios} miAgenteId={miAgenteId} esAdmin={esAdmin} />
 
-      <div className="grid gap-6 lg:grid-cols-[1fr_20rem]">
         <section className="space-y-4">
-          <Sabados sabados={sabados} agentes={agentes} usuarios={usuarios} miAgenteId={miAgenteId} esAdmin={esAdmin} />
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-2">
-              <Link href={`/?mes=${moverMes(mes, -1)}`} className="btn" aria-label="Mes anterior">
+              <h2 className="titulo">
+                Novedades de <span className="capitalize">{nombreMes(mes)}</span>
+              </h2>
+              <Link href={`/?mes=${moverMes(mes, -1)}`} className="btn ml-2 px-2" aria-label="Mes anterior">
                 ‹
               </Link>
-              <h1 className="min-w-56 text-center text-xl font-semibold">
-                Novedades de <span className="capitalize">{nombreMes(mes)}</span>
-              </h1>
-              <Link href={`/?mes=${moverMes(mes, 1)}`} className="btn" aria-label="Mes siguiente">
+              <Link href={`/?mes=${moverMes(mes, 1)}`} className="btn px-2" aria-label="Mes siguiente">
                 ›
               </Link>
               {mes !== mesActual() && (
@@ -78,32 +80,33 @@ export default async function ResumenPage({ searchParams }: PageProps<"/">) {
           <ListaNovedades novedades={novedades} mes={mes} />
         </section>
 
-        <aside className="space-y-6">
-          <Claves claves={claves} esAdmin={esAdmin} />
-          <Contactos contactos={contactos} />
-          <section className="card p-4">
-            <div className="mb-3 flex items-center justify-between">
-              <h2 className="font-semibold">Informes recientes</h2>
-              <Link href="/informes" className="btn-link">
-                Ver todos
-              </Link>
-            </div>
-            <ul className="space-y-3">
-              {informes.map((i) => (
-                <li key={i.id}>
-                  <Link href={`/informes/${i.id}`} className="font-medium text-blue-700 hover:underline">
-                    {i.titulo}
-                  </Link>
-                  <div className="text-xs text-slate-500">
-                    {i.categoria} · {i.actualizado}
-                  </div>
-                </li>
-              ))}
-              {informes.length === 0 && <li className="text-sm text-slate-500">Todavía no hay informes.</li>}
-            </ul>
-          </section>
-        </aside>
+        <section className="space-y-3">
+          <div className="flex items-center justify-between">
+            <h2 className="titulo">Informes recientes</h2>
+            <Link href="/informes" className="btn-link">
+              Ver todos
+            </Link>
+          </div>
+          <ul className="card divide-y divide-slate-200">
+            {informes.map((i) => (
+              <li key={i.id}>
+                <Link href={`/informes/${i.id}`} className="flex items-baseline justify-between gap-3 px-4 py-2.5 hover:bg-slate-50">
+                  <span className="min-w-0 font-bold text-slate-800">{i.titulo}</span>
+                  <span className="shrink-0 text-[13px] text-slate-500 tabular-nums">
+                    {i.categoria}, {i.actualizado}
+                  </span>
+                </Link>
+              </li>
+            ))}
+            {informes.length === 0 && <li className="px-4 py-3 text-sm text-slate-500">Todavía no hay informes.</li>}
+          </ul>
+        </section>
       </div>
+
+      <aside className="space-y-4 xl:sticky xl:top-8 xl:max-h-[calc(100vh-4rem)] xl:overflow-y-auto">
+        <Claves claves={claves} esAdmin={esAdmin} />
+        <Contactos contactos={contactos} />
+      </aside>
     </div>
   );
 }

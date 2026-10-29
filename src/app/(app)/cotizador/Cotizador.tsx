@@ -170,7 +170,7 @@ export function Cotizador({ tarifas, tipos, tareas }: { tarifas: Tarifa[]; tipos
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-xl font-semibold">Cotizador de tareas adicionales</h1>
+        <h1 className="titulo-pagina">Cotizador de tareas adicionales</h1>
         <p className="text-sm text-slate-500">Valores sin IVA. Elegí la tarea, el soporte contratado y si es remota o con visita.</p>
       </div>
 
@@ -240,7 +240,7 @@ export function Cotizador({ tarifas, tipos, tareas }: { tarifas: Tarifa[]; tipos
                 {resultado.detalle}
                 {tarifa && resultado.detalle !== "Valor fijo" && <span className="text-slate-400"> · tarifa {tarifa.nombre.toLowerCase()}</span>}
               </div>
-              <div className="mt-1 text-3xl font-semibold tabular-nums text-slate-900">
+              <div className="mt-1 text-3xl font-bold tabular-nums text-slate-900">
                 {formatPesos(neto)} <span className="text-lg font-medium text-slate-500">+ IVA</span>
               </div>
               <div className="mt-2 text-sm text-slate-600 tabular-nums">
@@ -260,7 +260,7 @@ export function Cotizador({ tarifas, tipos, tareas }: { tarifas: Tarifa[]; tipos
 
       <section className="card overflow-x-auto">
         <div className="flex items-center justify-between px-4 pt-3 pb-2">
-          <h2 className="font-semibold">Tareas cotizables · horas según el soporte</h2>
+          <h2 className="titulo">Tareas cotizables · horas según el soporte</h2>
           <FormDialog trigger="+ Tarea" title="Nueva tarea cotizable" action={crearTarea} wide>
             <CamposTarea tipos={tipos} />
           </FormDialog>
@@ -330,7 +330,7 @@ export function Cotizador({ tarifas, tipos, tareas }: { tarifas: Tarifa[]; tipos
           <div key={t.id} className="card p-4">
             <div className="mb-2 flex items-start justify-between gap-2">
               <div>
-                <h2 className="font-semibold">Tarifa {t.nombre.toLowerCase()}</h2>
+                <h2 className="titulo">Tarifa {t.nombre.toLowerCase()}</h2>
                 <p className="text-xs text-slate-500">
                   {tipos
                     .filter((x) => x.tarifa_id === t.id)

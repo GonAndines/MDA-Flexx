@@ -1,79 +1,143 @@
 @import "tailwindcss";
 
 @theme inline {
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-atkinson);
+  --font-mono: var(--font-atkinson-mono);
 }
 
-/* Fondo de tarjetas, campos y diálogos (bg-surface) y de la página: cambian con el tema. */
+/*
+ * Paleta "consola de guardia": grises verdosos fríos sin blanco puro (Niebla, Hoja, Grafito),
+ * un solo acento (Petróleo) y dos colores de estado (Ámbar señal, Coral alerta).
+ * Se redefinen las escalas de Tailwind para que todas las pantallas la tomen sin cambiar clases:
+ * slate = grises, blue = petróleo, amber = ámbar, red = coral, emerald = verde de "disponible".
+ */
 @theme {
-  --color-surface: #fff;
-  --color-page: #f6f7f9;
-  --color-ink: #1f2937;
+  --color-surface: #f7f9f8; /* Hoja: paneles, campos y diálogos */
+  --color-page: #e9edeb; /* Niebla: fondo */
+  --color-ink: #1f2a2e; /* Grafito: texto */
+
+  --color-slate-50: #f0f3f1;
+  --color-slate-100: #e3e8e5;
+  --color-slate-200: #d2dad6;
+  --color-slate-300: #b4c0bb;
+  --color-slate-400: #7f8d88;
+  --color-slate-500: #5b6a65;
+  --color-slate-600: #485651;
+  --color-slate-700: #35423e;
+  --color-slate-800: #27322f;
+  --color-slate-900: #1f2a2e;
+
+  --color-blue-50: #e2f0ee;
+  --color-blue-100: #c9e6e2;
+  --color-blue-200: #a6d5cf;
+  --color-blue-300: #6fb8af;
+  --color-blue-500: #1f8a82;
+  --color-blue-600: #0e6b66;
+  --color-blue-700: #0b5a56;
+  --color-blue-800: #094a47;
+  --color-blue-900: #073b39;
+
+  --color-amber-50: #fbf1df;
+  --color-amber-100: #f4e0b9;
+  --color-amber-600: #b7791f;
+  --color-amber-700: #8f5d12;
+  --color-amber-800: #6f480e;
+
+  --color-red-50: #f8e9e7;
+  --color-red-100: #f1d3cf;
+  --color-red-300: #dfa19a;
+  --color-red-500: #c9564b;
+  --color-red-600: #b8433a;
+  --color-red-700: #9e372f;
+  --color-red-800: #7f2c26;
+
+  --color-emerald-50: #e4f2ea;
+  --color-emerald-100: #d0e9da;
+  --color-emerald-300: #8cc7a5;
+  --color-emerald-700: #2d6e4a;
+  --color-emerald-800: #24583b;
 }
 
 body {
   background: var(--color-page);
   color: var(--color-ink);
+  font-size: 15px;
 }
 
 /*
- * Modo oscuro (elegido por cada usuario con el botón del encabezado; queda en la cookie "tema").
- * En lugar de duplicar clases, se redefine la paleta: los grises se invierten (los claros pasan a ser
- * fondos oscuros y los oscuros, texto claro) y los colores de acento usan tintes oscuros de fondo y
- * tonos claros de texto. El azul de los botones (600) y el texto sobre él (100) no cambian.
+ * Modo oscuro (elegido por cada usuario con el botón de la barra lateral; queda en la cookie "tema").
+ * Misma paleta en tonos nocturnos: los grises se invierten, los acentos usan tintes oscuros de fondo y
+ * tonos claros de texto. El texto sobre el petróleo de los botones (blue-100 y blanco) no cambia.
  */
 :root[data-theme="oscuro"] {
   color-scheme: dark;
-  --color-surface: #161f30;
-  --color-page: #0d1422;
-  --color-ink: #d5dce6;
+  --color-surface: #1a2124;
+  --color-page: #121719;
+  --color-ink: #d6dedb;
 
-  --color-slate-50: #1c2639;
-  --color-slate-100: #222d42;
-  --color-slate-200: #2e3a50;
-  --color-slate-300: #415069;
-  --color-slate-400: #7d8ba1;
-  --color-slate-500: #98a5b8;
-  --color-slate-600: #aeb9c8;
-  --color-slate-700: #c3ccd8;
-  --color-slate-800: #d5dce6;
-  --color-slate-900: #e4e9f0;
+  --color-slate-50: #1f282b;
+  --color-slate-100: #253033;
+  --color-slate-200: #2e3a3e;
+  --color-slate-300: #435258;
+  --color-slate-400: #7e8d88;
+  --color-slate-500: #99a7a2;
+  --color-slate-600: #afbbb7;
+  --color-slate-700: #c3cdc9;
+  --color-slate-800: #d6dedb;
+  --color-slate-900: #e3e9e6;
 
-  --color-blue-50: #172a4d;
-  --color-blue-200: #1f3d75;
-  --color-blue-300: #3b6fd4;
-  --color-blue-700: #8ab4f8;
-  --color-blue-800: #a9c7fa;
-  --color-blue-900: #c6dafc;
+  --color-blue-50: #173533;
+  --color-blue-200: #1f4b47;
+  --color-blue-300: #2f7a72;
+  --color-blue-500: #3e9d94;
+  --color-blue-600: #1f7f78;
+  --color-blue-700: #5bb8ae;
+  --color-blue-800: #86ccc4;
+  --color-blue-900: #b3e0da;
 
-  --color-red-50: #3a1820;
-  --color-red-100: #4d1f28;
-  --color-red-300: #8c2f3c;
-  --color-red-600: #f28b82;
-  --color-red-700: #f6a59e;
-  --color-red-800: #f9c1bc;
+  --color-amber-50: #33270f;
+  --color-amber-100: #45341a;
+  --color-amber-600: #e0a84a;
+  --color-amber-700: #e0a84a;
+  --color-amber-800: #ebc27e;
 
-  --color-emerald-50: #0f2e26;
-  --color-emerald-100: #134236;
-  --color-emerald-300: #1f7a5f;
-  --color-emerald-700: #6fd6ad;
-  --color-emerald-800: #9de3c6;
+  --color-red-50: #3a1d1b;
+  --color-red-100: #4d2421;
+  --color-red-300: #8a3a33;
+  --color-red-500: #d0665b;
+  --color-red-600: #e8857b;
+  --color-red-700: #ee9e95;
+  --color-red-800: #f3bcb5;
 
-  --color-amber-50: #33270c;
-  --color-amber-100: #463510;
-  --color-amber-700: #f2c55c;
-  --color-amber-800: #f6d68a;
+  --color-emerald-50: #15302a;
+  --color-emerald-100: #1a3d31;
+  --color-emerald-300: #2e7356;
+  --color-emerald-700: #7fcfa6;
+  --color-emerald-800: #a6dec0;
 }
 
 /* hover:bg-blue-700 de los botones principales: en oscuro el 700 es un texto claro, así que se oscurece aparte. */
 /* Y los links (texto blue-600) pasan al tono claro para que se lean sobre fondo oscuro. */
 :root[data-theme="oscuro"] .btn-primary:hover {
-  background-color: #1d4ed8;
+  background-color: #18706a;
 }
 :root[data-theme="oscuro"] .btn-link,
 :root[data-theme="oscuro"] .text-blue-600 {
   color: var(--color-blue-700);
+}
+
+/* Foco visible para quien navega con teclado. */
+:focus-visible {
+  outline: 2px solid var(--color-blue-500);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0s !important;
+  }
 }
 
 @layer components {
@@ -96,13 +160,25 @@ body {
     @apply rounded-md px-2 py-1 text-sm font-medium text-blue-600 hover:bg-blue-50;
   }
   .card {
-    @apply rounded-xl border border-slate-200 bg-surface shadow-sm;
+    @apply rounded-[10px] border border-slate-200 bg-surface;
   }
   .table {
     @apply w-full text-left text-sm;
   }
   .table th {
-    @apply border-b border-slate-200 bg-slate-50 px-3 py-2 text-xs font-semibold tracking-wide text-slate-500 uppercase;
+    @apply border-b border-slate-200 bg-slate-50 px-3 py-2 text-[13px] font-bold text-slate-600;
+  }
+  /* Título de sección: barrita de acento a la izquierda en lugar de encerrar cada bloque en una tarjeta. */
+  .titulo {
+    @apply border-l-[3px] border-blue-600 pl-2.5 text-lg leading-tight font-bold text-slate-900;
+  }
+  /* Título de página. */
+  .titulo-pagina {
+    @apply text-2xl leading-tight font-bold text-slate-900;
+  }
+  /* Etiqueta de grupo dentro de una sección (en minúsculas, no versalitas). */
+  .rotulo {
+    @apply text-[13px] font-bold text-slate-500;
   }
   .table td {
     @apply border-b border-slate-100 px-3 py-2 align-top;
@@ -113,13 +189,13 @@ body {
     @apply space-y-3 text-sm leading-relaxed text-slate-700;
   }
   .markdown h1 {
-    @apply text-xl font-semibold text-slate-900;
+    @apply text-xl font-bold text-slate-900;
   }
   .markdown h2 {
-    @apply pt-2 text-lg font-semibold text-slate-900;
+    @apply pt-2 text-lg font-bold text-slate-900;
   }
   .markdown h3 {
-    @apply font-semibold text-slate-900;
+    @apply font-bold text-slate-900;
   }
   .markdown ul {
     @apply list-disc space-y-1 pl-5;
@@ -131,7 +207,7 @@ body {
     @apply text-blue-700 underline;
   }
   .markdown strong {
-    @apply font-semibold text-slate-900;
+    @apply font-bold text-slate-900;
   }
   .markdown blockquote {
     @apply border-l-4 border-slate-200 pl-3 text-slate-600;

@@ -19,7 +19,7 @@ export default async function InformePage({ params }: PageProps<"/informes/[id]"
   const categorias = [...new Set([...CATEGORIAS_SUGERIDAS, ...cats.map((c) => c.categoria)])].sort();
 
   return (
-    <div className="mx-auto max-w-3xl space-y-4">
+    <div className="max-w-3xl space-y-4">
       <Link href={urlCategoria(informe.categoria)} className="btn-link -ml-2">
         ‹ {informe.categoria}
       </Link>
@@ -27,7 +27,7 @@ export default async function InformePage({ params }: PageProps<"/informes/[id]"
         <div className="mb-4 flex flex-wrap items-start justify-between gap-3 border-b border-slate-100 pb-4">
           <div>
             <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-600">{informe.categoria}</span>
-            <h1 className="mt-2 text-2xl font-semibold text-slate-900">{informe.titulo}</h1>
+            <h1 className="titulo-pagina mt-2">{informe.titulo}</h1>
             <p className="mt-1 text-xs text-slate-400">
               Actualizado {informe.actualizado}
               {informe.autor ? ` por ${informe.autor}` : ""}

@@ -36,14 +36,14 @@ export function NuevaNovedad({ mes }: { mes: string }) {
 
 export function ListaNovedades({ novedades, mes }: { novedades: Novedad[]; mes: string }) {
   if (novedades.length === 0) {
-    return <p className="card p-6 text-center text-sm text-slate-500">No hay novedades cargadas para este mes.</p>;
+    return <p className="rounded-[10px] border border-dashed border-slate-300 p-6 text-sm text-slate-500">No hay novedades cargadas para este mes. Usá el botón de arriba para agregar la primera.</p>;
   }
   return (
-    <div className="space-y-3">
+    <div className="card divide-y divide-slate-200">
       {novedades.map((n) => (
-        <article key={n.id} className="card p-4">
+        <article key={n.id} className="p-4">
           <div className="flex items-start justify-between gap-3">
-            <h3 className="font-semibold text-slate-900">{n.titulo}</h3>
+            <h3 className="font-bold text-slate-900">{n.titulo}</h3>
             <div className="flex shrink-0">
               <FormDialog trigger="Editar" triggerClassName="btn-link" title="Editar novedad" action={editarNovedad.bind(null, n.id)} wide>
                 <Campos n={n} mes={mes} />
@@ -52,8 +52,8 @@ export function ListaNovedades({ novedades, mes }: { novedades: Novedad[]; mes: 
             </div>
           </div>
           {n.texto && <Markdown className="mt-2">{n.texto}</Markdown>}
-          <p className="mt-3 text-xs text-slate-400">
-            {n.autor ? `${n.autor} · ` : ""}
+          <p className="mt-3 text-[13px] text-slate-500">
+            {n.autor ? `${n.autor}, ` : ""}
             {n.creado}
           </p>
         </article>

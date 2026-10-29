@@ -37,7 +37,7 @@ export function Usuarios({ usuarios, yoId }: { usuarios: UsuarioFila[]; yoId: nu
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-xl font-semibold">Usuarios</h1>
+          <h1 className="titulo-pagina">Usuarios</h1>
           <p className="text-sm text-slate-500">Los usuarios no se borran: se desactivan para conservar quién registró cada caso.</p>
         </div>
         <FormDialog trigger="+ Nuevo usuario" triggerClassName="btn-primary" title="Nuevo usuario" action={crearUsuario}>

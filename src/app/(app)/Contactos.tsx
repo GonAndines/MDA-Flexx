@@ -46,7 +46,7 @@ export function Contactos({ contactos }: { contactos: Contacto[] }) {
   return (
     <section className="card h-fit p-4">
       <div className="mb-3 flex items-center justify-between">
-        <h2 className="font-semibold">Contactos</h2>
+        <h2 className="titulo">Contactos</h2>
         <FormDialog trigger="+ Contacto" triggerClassName="btn-link" title="Nuevo contacto" action={crearContacto}>
           <Campos areas={areas} />
         </FormDialog>
@@ -57,7 +57,7 @@ export function Contactos({ contactos }: { contactos: Contacto[] }) {
       <div className="space-y-4">
         {areas.map((area) => (
           <div key={area}>
-            <h3 className="mb-1 text-xs font-semibold tracking-wide text-slate-500 uppercase">{area}</h3>
+            <h3 className="rotulo mb-1">{area}</h3>
             <ul className="space-y-2">
               {contactos
                 .filter((c) => c.area === area)
@@ -71,7 +71,7 @@ export function Contactos({ contactos }: { contactos: Contacto[] }) {
                         >
                           {TIPOS[c.tipo]}
                         </span>
-                        <span className="min-w-0 font-medium tabular-nums select-all">{c.valor}</span>
+                        <span className="min-w-0 font-mono font-bold text-slate-900 select-all">{c.valor}</span>
                       </div>
                       {c.detalle && <div className="mt-0.5 text-xs text-slate-500">{c.detalle}</div>}
                       <div className="mt-1 flex items-center gap-1 text-xs">

@@ -9,7 +9,7 @@ export default async function LoginPage() {
   return (
     <main className="flex flex-1 items-center justify-center p-4">
       <div className="card w-full max-w-sm p-6">
-        <h1 className="mb-1 text-xl font-semibold">Mesa de ayuda</h1>
+        <h1 className="titulo-pagina mb-1">Mesa de ayuda</h1>
         <p className="mb-6 text-sm text-slate-500">Ingresá con tu usuario.</p>
         <LoginForm />
       </div>

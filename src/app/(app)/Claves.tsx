@@ -36,16 +36,16 @@ const passNueva = ({ anio, mes, dia }: ReturnType<typeof hoyArgentina>, usuario:
 
 function Fila({ nombre, valor, children }: { nombre: string; valor: string; children?: React.ReactNode }) {
   return (
-    <li className="text-sm">
-      <div className="text-xs text-slate-500">{nombre}</div>
+    <li className="rounded-md bg-slate-50 px-3 py-2">
+      <div className="flex min-h-6 items-center justify-between gap-2 text-[13px] text-slate-500">
+        {nombre}
+        {children && <div className="-mr-2 flex shrink-0 items-center text-xs">{children}</div>}
+      </div>
       <div className="mt-0.5 flex items-center justify-between gap-2">
-        <code className="min-w-0 truncate font-mono font-medium text-slate-900 select-all">
+        <code className="min-w-0 truncate font-mono text-[17px] font-bold text-slate-900 select-all">
           {valor}
         </code>
-        <div className="flex shrink-0 items-center gap-1 text-xs">
-          <CopyButton text={valor} />
-          {children}
-        </div>
+        <CopyButton text={valor} />
       </div>
     </li>
   );
@@ -80,9 +80,9 @@ export function Claves({ claves, esAdmin }: { claves: Clave[]; esAdmin: boolean 
   const u = enCliente ? usuario.trim() : "";
 
   return (
-    <section className="card h-fit p-4">
+    <section className="card h-fit border-blue-200 p-4">
       <div className="mb-3 flex items-center justify-between">
-        <h2 className="font-semibold">Contraseñas</h2>
+        <h2 className="titulo">Contraseñas</h2>
         {esAdmin && (
           <FormDialog trigger="+ Contraseña" triggerClassName="btn-link" title="Nueva contraseña" action={crearClave}>
             <Campos />
@@ -106,7 +106,7 @@ export function Claves({ claves, esAdmin }: { claves: Clave[]; esAdmin: boolean 
         />
       </Field>
 
-      <ul className="mt-3 space-y-3">
+      <ul className="mt-3 space-y-2">
         {u ? (
           <>
             <Fila nombre="Pass Flexxus vieja" valor={passVieja(hoy, u)} />

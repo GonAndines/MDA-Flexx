@@ -144,7 +144,7 @@ export function Empresas({ empresas }: { empresas: EmpresaBasico[] }) {
   return (
     <div className="card overflow-x-auto">
       <div className="flex items-center justify-between px-4 pt-3 pb-2">
-        <h2 className="font-semibold">Empresas con soporte Básico · mes actual</h2>
+        <h2 className="titulo">Empresas con soporte Básico · mes actual</h2>
         <FormDialog trigger="+ Empresa" triggerClassName="btn" title="Agregar empresa con soporte Básico" action={crearEmpresa}>
           <CamposEmpresa />
         </FormDialog>
@@ -227,7 +227,7 @@ export function Casos({ casos, empresas }: { casos: Caso[]; empresas: EmpresaBas
                   <TicketLink ticket={c.ticket} />
                 </td>
                 <td className="whitespace-nowrap">
-                  <span className={`tabular-nums ${excedido ? "font-semibold text-red-700" : ""}`}>
+                  <span className={`tabular-nums ${excedido ? "font-bold text-red-700" : ""}`}>
                     {c.numero} de {LIMITE_CASOS_MES}
                   </span>
                   {excedido && <span className="ml-1 rounded bg-red-100 px-1.5 py-0.5 text-xs text-red-800">excedido</span>}

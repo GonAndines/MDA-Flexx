@@ -73,7 +73,7 @@ export function Categorias({ resumen, categorias }: { resumen: ResumenCategoria[
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-xl font-semibold">Informes</h1>
+          <h1 className="titulo-pagina">Informes</h1>
           <p className="text-sm text-slate-500">Notas de release, uso del sistema, procedimientos y otra información relevante.</p>
         </div>
         <NuevoInforme categorias={categorias} />
@@ -87,7 +87,7 @@ export function Categorias({ resumen, categorias }: { resumen: ResumenCategoria[
         {resumen.map((r) => (
           <Link key={r.categoria} href={urlCategoria(r.categoria)} className="card block p-4 hover:border-blue-300">
             <div className="flex items-start justify-between gap-2">
-              <h2 className="font-medium text-slate-900">{r.categoria}</h2>
+              <h2 className="text-lg font-bold text-slate-900">{r.categoria}</h2>
               <span className="shrink-0 rounded-full bg-blue-50 px-2 py-0.5 text-sm font-medium text-blue-700 tabular-nums">{r.cantidad}</span>
             </div>
             <p className="mt-2 text-xs text-slate-400">
@@ -119,7 +119,7 @@ export function ListaInformes({
       </Link>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-xl font-semibold">{titulo}</h1>
+          <h1 className="titulo-pagina">{titulo}</h1>
           <p className="text-sm text-slate-500">
             {informes.length === 1 ? "1 informe" : `${informes.length} informes`}
             {q && ` que ${informes.length === 1 ? "coincide" : "coinciden"} con "${q}"`}
@@ -140,7 +140,7 @@ export function ListaInformes({
 
       {informes.length === 0 && <p className="text-sm text-slate-500">No hay informes que coincidan.</p>}
 
-      <ul className="card divide-y divide-slate-100">
+      <ul className="card max-w-5xl divide-y divide-slate-200">
         {informes.map((i) => (
           <li key={i.id}>
             <Link href={`/informes/${i.id}`} className="block px-4 py-3 hover:bg-slate-50">

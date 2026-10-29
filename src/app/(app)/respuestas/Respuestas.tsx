@@ -46,7 +46,7 @@ export function Respuestas({ respuestas }: { respuestas: Respuesta[] }) {
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="text-xl font-semibold">Respuestas rápidas</h1>
+        <h1 className="titulo-pagina">Respuestas rápidas</h1>
         <FormDialog trigger="+ Nueva respuesta" triggerClassName="btn-primary" title="Nueva respuesta" action={crearRespuesta}>
           <Campos categorias={categorias} />
         </FormDialog>
