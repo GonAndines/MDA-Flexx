@@ -7,8 +7,9 @@ import { seedBase, seedDemo } from "./seed";
  * esas tablas quedan sin uso en las bases que ya existían (no se borran).
  * La 2 tenía tipos_soporte y tareas_cotizables con valores de ejemplo: la 3 las reemplaza.
  * La 4 agrega contactos. La 5 agrega la atención de los sábados. La 6 agrega las contraseñas fijas.
+ * La 7 agrega fechas (desde/hasta) y persona a las novedades, y el color de cada usuario en el calendario.
  */
-const VERSION = 6;
+const VERSION = 7;
 
 const DDL = [
   `create table if not exists usuarios (
@@ -122,6 +123,13 @@ const DDL = [
     valor text not null,
     orden int not null default 0
   )`,
+  // Novedades con fecha (un día o un rango, p. ej. vacaciones) y la persona a la que corresponden (vacío = todo el equipo).
+  `alter table novedades add column if not exists desde date`,
+  `alter table novedades add column if not exists hasta date`,
+  `alter table novedades add column if not exists persona_id int references usuarios(id) on delete set null`,
+  `create index if not exists novedades_fechas on novedades (desde, hasta)`,
+  // Color en el calendario; vacío = uno automático según el id (ver src/lib/colores.ts).
+  `alter table usuarios add column if not exists color text`,
   `create table if not exists schema_version (version int not null)`,
 ];
 
@@ -140,6 +148,10 @@ export async function ensureSchema(d: Driver) {
     for (const stmt of DDL) await d.query(stmt);
     await seedBase(d);
     if (nueva && process.env.SEED_DEMO !== "false") await seedDemo(d);
+    // Las novedades anteriores a la versión 7 solo tenían mes: quedan en el día en que se cargaron.
+    await d.query(
+      `update novedades set desde = (creado - interval '3 hours')::date, hasta = (creado - interval '3 hours')::date where desde is null`,
+    );
     await d.query("delete from schema_version");
     await d.query("insert into schema_version (version) values ($1)", [VERSION]);
   }

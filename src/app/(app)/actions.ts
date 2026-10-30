@@ -5,34 +5,55 @@ import { requireAdmin, requireUsuario } from "@/lib/auth";
 import { query } from "@/lib/db";
 import { texto } from "@/lib/format";
 
-// Novedades del equipo (se muestran en el Resumen, agrupadas por mes).
+// Novedades del equipo: un día o un rango de fechas (vacaciones, carpeta médica, etc.), opcionalmente de una persona.
+// Solo las carga el administrador; todos las ven en el calendario del Resumen.
 
-function leer(fd: FormData) {
+const FECHA = /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/;
+
+async function leer(fd: FormData) {
   const titulo = texto(fd, "titulo");
-  const mes = texto(fd, "mes");
+  const desde = texto(fd, "desde");
+  const hasta = texto(fd, "hasta") || desde;
+  const persona = texto(fd, "persona");
   if (!titulo) return { error: "El título es obligatorio." } as const;
-  if (!/^\d{4}-(0[1-9]|1[0-2])$/.test(mes)) return { error: "Elegí el mes." } as const;
-  return { datos: [`${mes}-01`, titulo, texto(fd, "texto")] } as const;
+  if (!FECHA.test(desde)) return { error: "Elegí la fecha (o la fecha de inicio)." } as const;
+  if (!FECHA.test(hasta)) return { error: "La fecha de fin no es válida." } as const;
+  if (hasta < desde) return { error: "La fecha de fin es anterior a la de inicio." } as const;
+  let personaId: number | null = null;
+  if (persona) {
+    personaId = Number(persona);
+    const [existe] = await query("select 1 from usuarios where id = $1", [personaId]);
+    if (!existe) return { error: "La persona elegida no existe." } as const;
+  }
+  return { datos: [desde, hasta, personaId, titulo, texto(fd, "texto")] } as const;
 }
 
 export async function crearNovedad(fd: FormData) {
-  const usuario = await requireUsuario();
-  const r = leer(fd);
+  const usuario = await requireAdmin();
+  const r = await leer(fd);
   if ("error" in r) return r;
-  await query("insert into novedades (mes, titulo, texto, usuario_id) values ($1, $2, $3, $4)", [...r.datos, usuario.id]);
+  await query(
+    `insert into novedades (desde, hasta, persona_id, titulo, texto, mes, usuario_id)
+     values ($1, $2, $3, $4, $5, date_trunc('month', $1::date), $6)`,
+    [...r.datos, usuario.id],
+  );
   revalidatePath("/");
 }
 
 export async function editarNovedad(id: number, fd: FormData) {
-  await requireUsuario();
-  const r = leer(fd);
+  await requireAdmin();
+  const r = await leer(fd);
   if ("error" in r) return r;
-  await query("update novedades set mes = $2, titulo = $3, texto = $4 where id = $1", [id, ...r.datos]);
+  await query(
+    `update novedades set desde = $2, hasta = $3, persona_id = $4, titulo = $5, texto = $6, mes = date_trunc('month', $2::date)
+     where id = $1`,
+    [id, ...r.datos],
+  );
   revalidatePath("/");
 }
 
 export async function borrarNovedad(id: number) {
-  await requireUsuario();
+  await requireAdmin();
   await query("delete from novedades where id = $1", [id]);
   revalidatePath("/");
 }

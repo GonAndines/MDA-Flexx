@@ -126,6 +126,16 @@ body {
   color: var(--color-blue-700);
 }
 
+/* Color de una persona en el calendario (las variables las pone estiloColor() de src/lib/colores.ts). */
+.color-persona {
+  background-color: var(--p-bg);
+  color: var(--p-fg);
+}
+:root[data-theme="oscuro"] .color-persona {
+  background-color: var(--p-bg-o);
+  color: var(--p-fg-o);
+}
+
 /* Foco visible para quien navega con teclado. */
 :focus-visible {
   outline: 2px solid var(--color-blue-500);

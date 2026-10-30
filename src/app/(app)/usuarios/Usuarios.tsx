@@ -1,9 +1,18 @@
 "use client";
 
 import { Field, FormDialog } from "@/components/FormDialog";
+import { COLORES, colorDe, estiloColor, type Color } from "@/lib/colores";
 import { crearUsuario, editarUsuario } from "./actions";
 
-export type UsuarioFila = { id: number; nombre: string; email: string; rol: "admin" | "operador"; activo: boolean; casos: number };
+export type UsuarioFila = {
+  id: number;
+  nombre: string;
+  email: string;
+  rol: "admin" | "operador";
+  activo: boolean;
+  color: string | null;
+  casos: number;
+};
 
 function Campos({ u }: { u?: UsuarioFila }) {
   return (
@@ -21,6 +30,16 @@ function Campos({ u }: { u?: UsuarioFila }) {
         <select name="rol" defaultValue={u?.rol ?? "operador"} className="input">
           <option value="operador">Operador</option>
           <option value="admin">Administrador (además gestiona usuarios)</option>
+        </select>
+      </Field>
+      <Field label="Color en el calendario de novedades">
+        <select name="color" defaultValue={u?.color ?? ""} className="input">
+          <option value="">Automático{u ? ` (${COLORES[colorDe(u.id, null)].nombre.toLowerCase()})` : ""}</option>
+          {(Object.keys(COLORES) as Color[]).map((c) => (
+            <option key={c} value={c}>
+              {COLORES[c].nombre}
+            </option>
+          ))}
         </select>
       </Field>
       {u && (
@@ -59,6 +78,11 @@ export function Usuarios({ usuarios, yoId }: { usuarios: UsuarioFila[]; yoId: nu
             {usuarios.map((u) => (
               <tr key={u.id} className={u.activo ? "" : "opacity-50"}>
                 <td className="font-medium">
+                  <span
+                    style={estiloColor(colorDe(u.id, u.color))}
+                    className="color-persona mr-2 inline-block h-3.5 w-3.5 rounded-full border-2 border-current align-[-2px]"
+                    title={`Color en el calendario: ${COLORES[colorDe(u.id, u.color)].nombre.toLowerCase()}`}
+                  />
                   {u.nombre}
                   {u.id === yoId && <span className="ml-1 text-xs text-slate-400">(vos)</span>}
                   {!u.activo && <span className="ml-1 text-xs text-slate-500">· inactivo</span>}

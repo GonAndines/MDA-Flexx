@@ -13,7 +13,7 @@ Herramienta interna de la mesa de ayuda: derivador de la central, atención de l
 | **Respuestas rápidas** | Respuestas predefinidas con categorías, búsqueda (sin importar acentos), botón Copiar, alta, edición y baja. |
 | **Cotizador** | Tabla de tareas cotizables con lo que se cotiza según el soporte (horas, "–" no aplica, a cotizar o valor fijo) y dos tarifas sin IVA: *con soporte* (Premium, Básico, Por Casos, Order Advanced) y *sin soporte*. Se elige tarea, soporte contratado y modalidad: **remota** = horas × valor hora; **visita** = primera hora + horas restantes × su valor. Muestra total + IVA, IVA 21 % y total con IVA, con botón para copiar. Se pueden agregar y editar tareas y tarifas. |
 | **Informes** | Notas de release, uso del sistema, procedimientos, etc., agrupados por **categoría**: la portada muestra una tarjeta por categoría con su cantidad, y al entrar se listan solo los de esa categoría, del más nuevo al más viejo. Búsqueda (sin importar acentos) dentro de la categoría o en todos. Texto con formato (títulos, listas, negritas, tablas, links) con vista previa. |
-| **Usuarios** | Solo administradores: alta de usuarios, rol (administrador u operador), activar/desactivar y cambio de contraseña. |
+| **Usuarios** | Solo administradores: alta de usuarios, rol (administrador u operador), color en el calendario de novedades, activar/desactivar y cambio de contraseña. |
 | **Mi cuenta** | Desde el enlace "Mi cuenta" del encabezado, cada usuario cambia su propia contraseña (pide la actual). |
 | **Modo oscuro** | El botón **☾ Modo oscuro / ☀ Modo claro** de la barra lateral (en el celular, el ícono de arriba) cambia el tema de toda la plataforma. Cada usuario elige el suyo y queda guardado en su navegador (cookie `tema`). |
 
@@ -40,9 +40,15 @@ Cronograma con el agente de atención **activa** y el de atención **pasiva** de
 
 El cupo por período está en `src/app/(app)/sabados-actions.ts` (`LIMITE_POR_TANDA`).
 
-### Novedades del mes
+### Novedades del mes (calendario)
 
-Novedades del equipo agrupadas por mes, con flechas para navegar entre meses. Cualquier usuario puede agregar, editar y borrar.
+Calendario mensual (de lunes a domingo) con las novedades del equipo: vacaciones, carpetas médicas, licencias, capacitaciones, etc. Con las flechas se pasa a los meses anteriores o próximos.
+
+- Cada novedad es **un día** o un **rango** (*Desde* / *Hasta*; si *Hasta* queda vacío, es un solo día) y puede ser de **una persona** o de **todo el equipo**.
+- En el calendario se ve como una barra del **color de la persona** que cruza los días que dura (las de todo el equipo, en gris). Al tocarla, baja al detalle.
+- Debajo del calendario se listan las novedades del mes con su detalle.
+- **Solo el administrador** las carga, edita y borra (**+ Novedad**). Los demás usuarios las ven.
+- El color de cada usuario se elige en **Usuarios → Editar** (*Color en el calendario de novedades*). Si no se elige, se asigna uno automático.
 
 ### Contraseñas
 
@@ -84,7 +90,7 @@ Abrí http://localhost:3000 e ingresá con `ADMIN_EMAIL` / `ADMIN_PASSWORD`. Si 
 
 La primera vez que arranca, la aplicación crea las tablas y el usuario administrador, y carga las **15 empresas con soporte Básico**, las tarifas, la tabla de tareas cotizables vigentes y el **cronograma de sábados** inicial. En una base nueva agrega además **datos de ejemplo** (respuestas, novedades, informes y algunos casos con tickets ficticios); con `SEED_DEMO=false` no se cargan.
 
-**Actualización de bases existentes:** la base guarda su versión de esquema (tabla `schema_version`, hoy versión 6). Al desplegar una versión nueva, las tablas que faltan se crean y se cargan solas en el primer acceso, sin tocar los datos existentes. Las tablas de la versión 1 (`planes`, `empresas`, `llamadas`, `tareas`) quedan sin uso y no se borran; se pueden eliminar a mano cuando ya no hagan falta.
+**Actualización de bases existentes:** la base guarda su versión de esquema (tabla `schema_version`, hoy versión 7). Al desplegar una versión nueva, las tablas que faltan se crean y se cargan solas en el primer acceso, sin tocar los datos existentes. Las tablas de la versión 1 (`planes`, `empresas`, `llamadas`, `tareas`) quedan sin uso y no se borran; se pueden eliminar a mano cuando ya no hagan falta.
 
 ## Variables de entorno
 
@@ -206,3 +212,4 @@ Las horas se manejan en hora de Argentina (UTC−3).
 | 27/10/2026 | **Contraseñas** en el Resumen: Flexxus vieja y nueva calculadas con la fecha y el usuario ingresado, y contraseñas fijas (Firebird) que carga el administrador. Todas se copian con un botón. |
 | 27/10/2026 | **Modo oscuro** opcional, con un botón en el encabezado. Se recuerda por navegador. |
 | 29/10/2026 | **Rediseño visual:** navegación en barra lateral, paleta petróleo sobre grises verdosos (también en oscuro), tipografía Atkinson Hyperlegible (distingue l/1/I y 0/O al dictar contraseñas) y, en el Resumen, Contraseñas y Contactos fijos a la derecha al scrollear. Sin cambios de funcionalidad. |
+| 29/10/2026 | **Novedades en calendario:** solo el administrador las carga, con un día o un rango de fechas y la persona a la que corresponden; todos las ven en un calendario mensual con un color por usuario (elegible en *Usuarios*). Las novedades anteriores quedan en el día en que se cargaron. |

@@ -3,10 +3,12 @@ import { Ivr } from "@/components/Ivr";
 import { sincronizarAgentes } from "@/lib/agentes";
 import { requireUsuario } from "@/lib/auth";
 import { AHORA_AR, query } from "@/lib/db";
-import { mesActual, mesValido, moverMes, nombreMes } from "@/lib/format";
+import { rangoCalendario } from "@/lib/calendario";
+import { colorDe } from "@/lib/colores";
+import { ahoraArgentina, mesActual, mesValido, moverMes, nombreMes } from "@/lib/format";
 import { Claves, type Clave } from "./Claves";
 import { Contactos, type Contacto } from "./Contactos";
-import { ListaNovedades, NuevaNovedad, type Novedad } from "./Novedades";
+import { Calendario, ListaNovedades, NuevaNovedad, type Novedad, type Persona } from "./Novedades";
 import { Sabados, type Agente, type Sabado } from "./Sabados";
 
 export const metadata = { title: "Resumen · Mesa de ayuda" };
@@ -17,16 +19,20 @@ export default async function ResumenPage({ searchParams }: PageProps<"/">) {
 
   const usuario = await requireUsuario();
   const esAdmin = usuario.rol === "admin";
-  const hoy = `(${AHORA_AR})::date`;
+  const hoySql = `(${AHORA_AR})::date`;
+  const hoy = ahoraArgentina().slice(0, 10);
+  const calendario = rangoCalendario(mes);
   await sincronizarAgentes();
 
-  const [novedades, informes, contactos, sabados, agentes, usuarios, claves] = await Promise.all([
-    query<Novedad>(
-      `select n.id, to_char(n.mes, 'YYYY-MM') as mes, n.titulo, n.texto, u.nombre as autor,
-              to_char(n.creado - interval '3 hours', 'DD/MM/YYYY') as creado
-       from novedades n left join usuarios u on u.id = n.usuario_id
-       where n.mes = $1::date order by n.creado desc`,
-      [`${mes}-01`],
+  const [filasNovedades, informes, contactos, sabados, agentes, usuarios, claves, personas] = await Promise.all([
+    // Las que se ven en el calendario del mes (incluye los días de los meses vecinos que completan las semanas).
+    query<Omit<Novedad, "color"> & { color_persona: string | null }>(
+      `select n.id, n.titulo, n.texto, to_char(n.desde, 'YYYY-MM-DD') as desde, to_char(n.hasta, 'YYYY-MM-DD') as hasta,
+              n.persona_id, p.nombre as persona, p.color as color_persona
+       from novedades n left join usuarios p on p.id = n.persona_id
+       where n.desde <= $2::date and n.hasta >= $1::date
+       order by n.desde, n.hasta desc, n.id`,
+      [calendario.desde, calendario.hasta],
     ),
     query<{ id: number; titulo: string; categoria: string; actualizado: string }>(
       `select id, titulo, categoria, to_char(actualizado - interval '3 hours', 'DD/MM/YYYY') as actualizado
@@ -35,7 +41,7 @@ export default async function ResumenPage({ searchParams }: PageProps<"/">) {
     query<Contacto>("select id, area, tipo, valor, detalle from contactos order by area, id"),
     query<Sabado>(
       `select s.id, to_char(s.fecha, 'YYYY-MM-DD') as fecha, s.tanda, s.feriado, s.activa_id, s.pasiva_id,
-              a.nombre as activa, p.nombre as pasiva, s.fecha > ${hoy} as futuro, s.fecha >= ${hoy} as vigente
+              a.nombre as activa, p.nombre as pasiva, s.fecha > ${hoySql} as futuro, s.fecha >= ${hoySql} as vigente
        from sabados s left join agentes a on a.id = s.activa_id left join agentes p on p.id = s.pasiva_id
        order by s.fecha`,
     ),
@@ -46,7 +52,10 @@ export default async function ResumenPage({ searchParams }: PageProps<"/">) {
     ),
     esAdmin ? query<{ id: number; nombre: string }>("select id, nombre from usuarios where activo order by nombre") : [],
     query<Clave>("select id, nombre, valor from claves order by orden, id"),
+    esAdmin ? query<Persona>("select id, nombre from usuarios where activo order by nombre") : [],
   ]);
+  const novedades: Novedad[] = filasNovedades.map(({ color_persona, ...n }) => ({ ...n, color: colorDe(n.persona_id, color_persona) }));
+  const novedadesDelMes = novedades.filter((n) => n.desde.slice(0, 7) <= mes && n.hasta.slice(0, 7) >= mes);
   const miAgenteId = agentes.find((a) => a.usuario_id === usuario.id && a.activo)?.id ?? null;
 
   // Columna principal con lo que se consulta; a la derecha, fijo al scrollear, lo que se copia (contraseñas y contactos).
@@ -57,27 +66,28 @@ export default async function ResumenPage({ searchParams }: PageProps<"/">) {
         <Ivr />
         <Sabados sabados={sabados} agentes={agentes} usuarios={usuarios} miAgenteId={miAgenteId} esAdmin={esAdmin} />
 
-        <section className="space-y-4">
+        <section id="novedades" className="scroll-mt-6 space-y-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-2">
               <h2 className="titulo">
                 Novedades de <span className="capitalize">{nombreMes(mes)}</span>
               </h2>
-              <Link href={`/?mes=${moverMes(mes, -1)}`} className="btn ml-2 px-2" aria-label="Mes anterior">
+              <Link href={`/?mes=${moverMes(mes, -1)}#novedades`} className="btn ml-2 px-2" aria-label="Mes anterior">
                 ‹
               </Link>
-              <Link href={`/?mes=${moverMes(mes, 1)}`} className="btn px-2" aria-label="Mes siguiente">
+              <Link href={`/?mes=${moverMes(mes, 1)}#novedades`} className="btn px-2" aria-label="Mes siguiente">
                 ›
               </Link>
               {mes !== mesActual() && (
-                <Link href="/" className="btn-link">
+                <Link href="/#novedades" className="btn-link">
                   Mes actual
                 </Link>
               )}
             </div>
-            <NuevaNovedad mes={mes} />
+            {esAdmin && <NuevaNovedad personas={personas} hoy={hoy} />}
           </div>
-          <ListaNovedades novedades={novedades} mes={mes} />
+          <Calendario mes={mes} novedades={novedades} hoy={hoy} />
+          <ListaNovedades novedades={novedadesDelMes} personas={personas} esAdmin={esAdmin} hoy={hoy} />
         </section>
 
         <section className="space-y-3">
