@@ -126,6 +126,13 @@ body {
   color: var(--color-blue-700);
 }
 
+/* Logo de Flexxus: el gris del logo no se lee sobre fondo oscuro, así que en oscuro va sobre una placa clara. */
+:root[data-theme="oscuro"] .logo {
+  background-color: #f7f9f8;
+  border-radius: 6px;
+  padding: 2px 6px;
+}
+
 /* Color de una persona en el calendario (las variables las pone estiloColor() de src/lib/colores.ts). */
 .color-persona {
   background-color: var(--p-bg);

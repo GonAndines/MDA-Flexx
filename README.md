@@ -213,3 +213,4 @@ Las horas se manejan en hora de Argentina (UTC−3).
 | 27/10/2026 | **Modo oscuro** opcional, con un botón en el encabezado. Se recuerda por navegador. |
 | 29/10/2026 | **Rediseño visual:** navegación en barra lateral, paleta petróleo sobre grises verdosos (también en oscuro), tipografía Atkinson Hyperlegible (distingue l/1/I y 0/O al dictar contraseñas) y, en el Resumen, Contraseñas y Contactos fijos a la derecha al scrollear. Sin cambios de funcionalidad. |
 | 29/10/2026 | **Novedades en calendario:** solo el administrador las carga, con un día o un rango de fechas y la persona a la que corresponden; todos las ven en un calendario mensual con un color por usuario (elegible en *Usuarios*). Las novedades anteriores quedan en el día en que se cargaron. |
+| 29/10/2026 | **Logo de Flexxus** en el login y en la barra lateral (en modo oscuro, sobre una placa clara). |

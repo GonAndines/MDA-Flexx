@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Logo } from "@/components/Logo";
 import { Nav } from "@/components/Nav";
 import { BotonTema } from "@/components/Tema";
 import { requireUsuario } from "@/lib/auth";
@@ -21,8 +22,10 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
     <div className="flex flex-1 flex-col lg:flex-row">
       <aside className="border-b border-slate-200 bg-surface lg:sticky lg:top-0 lg:flex lg:h-screen lg:w-56 lg:shrink-0 lg:flex-col lg:border-r lg:border-b-0">
         <div className="flex items-center justify-between gap-3 px-4 pt-3 lg:px-5 lg:pt-6 lg:pb-5">
-          <Link href="/" className="text-lg leading-tight font-bold whitespace-nowrap text-slate-900">
-            Mesa de ayuda
+          <Link href="/" className="flex items-center gap-2 lg:flex-col lg:items-start lg:gap-2">
+            <Logo ancho={84} className="lg:hidden" />
+            <Logo ancho={130} className="hidden lg:block" />
+            <span className="hidden text-base leading-tight font-bold whitespace-nowrap text-slate-700 sm:inline">Mesa de ayuda</span>
           </Link>
           <div className="flex items-center text-sm whitespace-nowrap lg:hidden">
             <BotonTema inicial={await leerTema()} />
