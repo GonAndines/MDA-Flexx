@@ -13,6 +13,7 @@ Herramienta interna de la mesa de ayuda: derivador de la central, atención de l
 | **Respuestas rápidas** | Respuestas predefinidas con categorías, búsqueda (sin importar acentos), botón Copiar, alta, edición y baja. |
 | **Cotizador** | Tabla de tareas cotizables con lo que se cotiza según el soporte (horas, "–" no aplica, a cotizar o valor fijo) y dos tarifas sin IVA: *con soporte* (Premium, Básico, Por Casos, Order Advanced) y *sin soporte*. Se elige tarea, soporte contratado y modalidad: **remota** = horas × valor hora; **visita** = primera hora + horas restantes × su valor. Muestra total + IVA, IVA 21 % y total con IVA, con botón para copiar. Se pueden agregar y editar tareas y tarifas. |
 | **Informes** | Notas de release, uso del sistema, procedimientos, etc., agrupados por **categoría**: la portada muestra una tarjeta por categoría con su cantidad, y al entrar se listan solo los de esa categoría, del más nuevo al más viejo. Búsqueda (sin importar acentos) dentro de la categoría o en todos. Texto con formato (títulos, listas, negritas, tablas, links) con vista previa. |
+| **Indicadores** | Solo administradores: totales mensuales y anuales de rings perdidos, llamadas atendidas y tickets resueltos, gráfico de barras de rings perdidos por día de la semana (del año o de un mes) y de totales por mes. Detalle en [Indicadores](#indicadores). |
 | **Usuarios** | Solo administradores: alta de usuarios, rol (administrador u operador), color en el calendario de novedades, activar/desactivar y cambio de contraseña. |
 | **Mi cuenta** | Desde el enlace "Mi cuenta" del encabezado, cada usuario cambia su propia contraseña (pide la actual). |
 | **Modo oscuro** | El botón **☾ Modo oscuro / ☀ Modo claro** de la barra lateral (en el celular, el ícono de arriba) cambia el tema de toda la plataforma. Cada usuario elige el suyo y queda guardado en su navegador (cookie `tema`). |
@@ -69,6 +70,14 @@ WhatsApp, teléfonos, mails y otros datos de Soporte, Administración y demás �
 
 Los últimos informes actualizados, con acceso directo a cada uno.
 
+## Indicadores
+
+Pestaña solo para administradores.
+
+- **Importar Excel de rings:** se sube la planilla de rings perdidos (`.xlsx`) indicando el año. Tiene que tener un cuadro por mes: el nombre del mes en una celda y debajo una fila por día de la semana con la cantidad (la columna de porcentaje y el cuadro "ANUAL" se ignoran; la app los calcula). Cada mes que trae datos reemplaza al que estaba cargado; los meses que vienen todos en cero se ignoran.
+- **Editar** (en la tabla de meses): carga o corrige a mano los rings perdidos por día, las llamadas atendidas y los tickets resueltos de un mes. Vacío significa "sin dato", no cero.
+- **Gráficos:** rings perdidos por día de la semana (de todo el año o de un mes, con el día que más tiene destacado) y totales por mes del indicador elegido. Al pasar el mouse sobre una barra se ve el valor y el porcentaje.
+
 ## Correr en local
 
 Requiere Node.js 20 o superior.
@@ -90,7 +99,7 @@ Abrí http://localhost:3000 e ingresá con `ADMIN_EMAIL` / `ADMIN_PASSWORD`. Si 
 
 La primera vez que arranca, la aplicación crea las tablas y el usuario administrador, y carga las **15 empresas con soporte Básico**, las tarifas, la tabla de tareas cotizables vigentes y el **cronograma de sábados** inicial. En una base nueva agrega además **datos de ejemplo** (respuestas, novedades, informes y algunos casos con tickets ficticios); con `SEED_DEMO=false` no se cargan.
 
-**Actualización de bases existentes:** la base guarda su versión de esquema (tabla `schema_version`, hoy versión 7). Al desplegar una versión nueva, las tablas que faltan se crean y se cargan solas en el primer acceso, sin tocar los datos existentes. Las tablas de la versión 1 (`planes`, `empresas`, `llamadas`, `tareas`) quedan sin uso y no se borran; se pueden eliminar a mano cuando ya no hagan falta.
+**Actualización de bases existentes:** la base guarda su versión de esquema (tabla `schema_version`, hoy versión 8). Al desplegar una versión nueva, las tablas que faltan se crean y se cargan solas en el primer acceso, sin tocar los datos existentes. Las tablas de la versión 1 (`planes`, `empresas`, `llamadas`, `tareas`) quedan sin uso y no se borran; se pueden eliminar a mano cuando ya no hagan falta.
 
 ## Variables de entorno
 
@@ -214,3 +223,4 @@ Las horas se manejan en hora de Argentina (UTC−3).
 | 29/10/2026 | **Rediseño visual:** navegación en barra lateral, paleta petróleo sobre grises verdosos (también en oscuro), tipografía Atkinson Hyperlegible (distingue l/1/I y 0/O al dictar contraseñas) y, en el Resumen, Contraseñas y Contactos fijos a la derecha al scrollear. Sin cambios de funcionalidad. |
 | 29/10/2026 | **Novedades en calendario:** solo el administrador las carga, con un día o un rango de fechas y la persona a la que corresponden; todos las ven en un calendario mensual con un color por usuario (elegible en *Usuarios*). Las novedades anteriores quedan en el día en que se cargaron. |
 | 29/10/2026 | **Logo de Flexxus** en el login y en la barra lateral (en modo oscuro, sobre una placa clara). |
+| 04/11/2026 | **Indicadores** (solo administradores): rings perdidos, llamadas atendidas y tickets resueltos por mes y año, con gráficos de barras por día de la semana y por mes, e importación de la planilla de rings perdidos. |

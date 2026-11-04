@@ -14,7 +14,12 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
     { href: "/respuestas", label: "Respuestas rápidas" },
     { href: "/cotizador", label: "Cotizador" },
     { href: "/informes", label: "Informes" },
-    ...(usuario.rol === "admin" ? [{ href: "/usuarios", label: "Usuarios" }] : []),
+    ...(usuario.rol === "admin"
+      ? [
+          { href: "/indicadores", label: "Indicadores" },
+          { href: "/usuarios", label: "Usuarios" },
+        ]
+      : []),
   ];
 
   // Barra lateral fija en pantallas anchas; en el celular queda arriba, con las pestañas en una tira.

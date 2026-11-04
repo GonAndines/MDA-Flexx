@@ -126,6 +126,14 @@ body {
   color: var(--color-blue-700);
 }
 
+/* Barras de los gráficos de Indicadores (validadas contra el fondo claro y el oscuro). */
+.barra {
+  background-color: #008c7e;
+}
+:root[data-theme="oscuro"] .barra {
+  background-color: #1fa595;
+}
+
 /* Logo de Flexxus: el gris del logo no se lee sobre fondo oscuro, así que en oscuro va sobre una placa clara. */
 :root[data-theme="oscuro"] .logo {
   background-color: #f7f9f8;

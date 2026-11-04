@@ -8,8 +8,9 @@ import { seedBase, seedDemo } from "./seed";
  * La 2 tenía tipos_soporte y tareas_cotizables con valores de ejemplo: la 3 las reemplaza.
  * La 4 agrega contactos. La 5 agrega la atención de los sábados. La 6 agrega las contraseñas fijas.
  * La 7 agrega fechas (desde/hasta) y persona a las novedades, y el color de cada usuario en el calendario.
+ * La 8 agrega los indicadores mensuales (rings perdidos, llamadas atendidas, tickets resueltos).
  */
-const VERSION = 7;
+const VERSION = 8;
 
 const DDL = [
   `create table if not exists usuarios (
@@ -130,6 +131,15 @@ const DDL = [
   `create index if not exists novedades_fechas on novedades (desde, hasta)`,
   // Color en el calendario; vacío = uno automático según el id (ver src/lib/colores.ts).
   `alter table usuarios add column if not exists color text`,
+  // Indicadores por mes. dia_semana: 1 = lunes … 7 = domingo (detalle de los rings perdidos); 0 = total del mes sin detalle.
+  `create table if not exists indicadores (
+    indicador text not null check (indicador in ('rings_perdidos', 'llamadas_atendidas', 'tickets_resueltos')),
+    anio int not null,
+    mes int not null check (mes between 1 and 12),
+    dia_semana int not null default 0 check (dia_semana between 0 and 7),
+    valor int not null check (valor >= 0),
+    primary key (indicador, anio, mes, dia_semana)
+  )`,
   `create table if not exists schema_version (version int not null)`,
 ];
 
