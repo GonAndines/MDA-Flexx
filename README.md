@@ -224,3 +224,4 @@ Las horas se manejan en hora de Argentina (UTC−3).
 | 29/10/2026 | **Novedades en calendario:** solo el administrador las carga, con un día o un rango de fechas y la persona a la que corresponden; todos las ven en un calendario mensual con un color por usuario (elegible en *Usuarios*). Las novedades anteriores quedan en el día en que se cargaron. |
 | 29/10/2026 | **Logo de Flexxus** en el login y en la barra lateral (en modo oscuro, sobre una placa clara). |
 | 04/11/2026 | **Indicadores** (solo administradores): rings perdidos, llamadas atendidas y tickets resueltos por mes y año, con gráficos de barras por día de la semana y por mes, e importación de la planilla de rings perdidos. |
+| 10/11/2026 | **Cotizador:** el botón Copiar arma el texto para el cliente ("El valor de la tarea es de: $ … + IVA." y la validez del presupuesto: 5 días o hasta fin de mes, lo que suceda primero). |

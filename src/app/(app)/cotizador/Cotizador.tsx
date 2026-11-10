@@ -157,13 +157,12 @@ export function Cotizador({ tarifas, tipos, tareas }: { tarifas: Tarifa[]; tipos
 
   const neto = resultado ? Math.round(resultado.neto * 100) / 100 : 0;
   const iva = Math.round(neto * IVA * 100) / 100;
+  // Texto para pegarle al cliente.
   const textoCotizacion =
     resultado && tipo
       ? [
-          `Cotización${tarea ? `: ${tarea.nombre}` : ""} — soporte ${tipo.nombre}` +
-            (resultado.detalle === "Valor fijo" ? "" : `, ${modalidad === "remota" ? "solución remota" : "visita a empresa"}`),
-          `${resultado.detalle} = ${formatPesos(neto)} + IVA`,
-          `IVA ${IVA * 100}%: ${formatPesos(iva)} · Total con IVA: ${formatPesos(neto + iva)}`,
+          `El valor de la tarea es de: ${formatPesos(neto)} + IVA.`,
+          "La validez del presupuesto es por 5 días, o hasta finalizar el mes en curso, lo que suceda primero.",
         ].join("\n")
       : "";
 
