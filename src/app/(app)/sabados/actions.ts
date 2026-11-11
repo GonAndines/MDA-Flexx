@@ -13,7 +13,7 @@ type Rol = "activa" | "pasiva";
 const HOY = `(${AHORA_AR})::date`;
 
 function refrescar() {
-  revalidatePath("/");
+  revalidatePath("/sabados");
 }
 
 function columnas(rol: Rol) {

@@ -11,6 +11,7 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
   const tabs = [
     { href: "/", label: "Resumen" },
     { href: "/soporte-basico", label: "Soporte Básico" },
+    { href: "/sabados", label: "Sábados" },
     { href: "/respuestas", label: "Respuestas rápidas" },
     { href: "/cotizador", label: "Cotizador" },
     { href: "/informes", label: "Informes" },

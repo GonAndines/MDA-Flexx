@@ -8,8 +8,9 @@ Herramienta interna de la mesa de ayuda: derivador de la central, atención de l
 
 | Pestaña | Qué hace |
 |---|---|
-| **Resumen** | Pantalla principal: derivador IVR, atención de los sábados, novedades del mes, contraseñas, contactos de las áreas e informes recientes. Detalle en [Resumen](#resumen). |
+| **Resumen** | Pantalla principal: derivador IVR, novedades del mes, contraseñas, contactos de las áreas e informes recientes. Detalle en [Resumen](#resumen). |
 | **Soporte Básico** | Lista de empresas con soporte Básico y sus casos del mes. Registrar un caso: empresa + número de ticket (se puede pegar la URL) + fecha. El ticket abre `https://soporte.flexxus.com.ar/tickets/<número>`. Cada empresa tiene **5 casos por mes calendario**: al llegar, la app avisa "sin llamadas disponibles" y el sexto en adelante queda marcado como excedido. No permite repetir un ticket. |
+| **Sábados** | Atención de los sábados: cronograma, postulación de agentes y carga de fechas. Detalle en [Atención de los sábados](#atención-de-los-sábados-pestaña-sábados). |
 | **Respuestas rápidas** | Respuestas predefinidas con categorías, búsqueda (sin importar acentos), botón Copiar, alta, edición y baja. |
 | **Cotizador** | Tabla de tareas cotizables con lo que se cotiza según el soporte (horas, "–" no aplica, a cotizar o valor fijo) y dos tarifas sin IVA: *con soporte* (Premium, Básico, Por Casos, Order Advanced) y *sin soporte*. Se elige tarea, soporte contratado y modalidad: **remota** = horas × valor hora; **visita** = primera hora + horas restantes × su valor. Muestra total + IVA, IVA 21 % y total con IVA, con botón para copiar. Se pueden agregar y editar tareas y tarifas. |
 | **Informes** | Notas de release, uso del sistema, procedimientos, etc., agrupados por **categoría**: la portada muestra una tarjeta por categoría con su cantidad, y al entrar se listan solo los de esa categoría, del más nuevo al más viejo. Búsqueda (sin importar acentos) dentro de la categoría o en todos. Texto con formato (títulos, listas, negritas, tablas, links) con vista previa. |
@@ -26,7 +27,9 @@ El límite de casos (5) y el IVA (21 %) están en `src/lib/format.ts`.
 
 Diagrama del menú de la central (0351-5685000, interno 7777). Cada destino muestra la secuencia de teclas (por ejemplo, **Desarrollo = 2-1-3**) y al tocarlo se resalta el camino completo. El menú se edita en `src/lib/ivr.ts`.
 
-### Atención de los sábados
+### Atención de los sábados (pestaña Sábados)
+
+Está en su propia pestaña, **Sábados**.
 
 Cronograma con el agente de atención **activa** y el de atención **pasiva** de cada sábado.
 
@@ -39,7 +42,7 @@ Cronograma con el agente de atención **activa** y el de atención **pasiva** de
   - **Agentes de los sábados** (al pie del cuadro): lista de agentes y el usuario vinculado a cada uno. Desde ahí se vinculan nombres a usuarios, se renombran y se desactivan agentes.
 - **Cronograma inicial:** la base arranca con los sábados de febrero a noviembre de 2026 (planilla SABADOS.xlsx). Los nombres de esa planilla (Carol, Karen, Gaston, Rodrigo, Agustin, Martin, TiTa, Gonzalo, Fer) se vinculan solos al usuario cuyo **primer nombre** coincide, y así ese usuario conserva su historial. Los que no coinciden (apodos como "Fer" o "TiTa") el administrador los vincula a mano: *Agentes de los sábados → Editar → Usuario de la plataforma*. Si al usuario ya se le había creado un agente propio sin sábados, ese duplicado se borra al vincularlo.
 
-El cupo por período está en `src/app/(app)/sabados-actions.ts` (`LIMITE_POR_TANDA`).
+El cupo por período está en `src/app/(app)/sabados/actions.ts` (`LIMITE_POR_TANDA`).
 
 ### Novedades del mes (calendario)
 
@@ -119,7 +122,7 @@ La primera vez que arranca, la aplicación crea las tablas y el usuario administ
    - Alternativa: crear la base en [neon.tech](https://neon.tech) y pegar la cadena de conexión en `DATABASE_URL`.
 4. **Variables de entorno** (*Settings → Environment Variables*): `AUTH_SECRET`, `ADMIN_EMAIL`, `ADMIN_PASSWORD` y, si querés arrancar sin datos de ejemplo, `SEED_DEMO=false`.
 5. **Deploy.** En el primer acceso la aplicación crea las tablas y el administrador. Ingresá, cambiá la contraseña del admin y creá los usuarios del equipo (a mano o con el [alta masiva](#alta-masiva-de-usuarios)).
-6. **Sábados:** en *Resumen → Atención de los sábados → Agentes de los sábados*, vinculá los nombres que quedaron "Sin vincular" a su usuario.
+6. **Sábados:** en la pestaña *Sábados → Agentes de los sábados*, vinculá los nombres que quedaron "Sin vincular" a su usuario.
 7. **Contraseñas:** en *Resumen → Contraseñas*, cargá las contraseñas fijas con **+ Contraseña**.
 
 Con la CLI, en lugar de los pasos 2 a 5:
@@ -225,3 +228,4 @@ Las horas se manejan en hora de Argentina (UTC−3).
 | 29/10/2026 | **Logo de Flexxus** en el login y en la barra lateral (en modo oscuro, sobre una placa clara). |
 | 04/11/2026 | **Indicadores** (solo administradores): rings perdidos, llamadas atendidas y tickets resueltos por mes y año, con gráficos de barras por día de la semana y por mes, e importación de la planilla de rings perdidos. |
 | 10/11/2026 | **Cotizador:** el botón Copiar arma el texto para el cliente ("El valor de la tarea es de: $ … + IVA." y la validez del presupuesto: 5 días o hasta fin de mes, lo que suceda primero). |
+| 11/11/2026 | **Sábados** pasa a ser una pestaña propia (antes estaba dentro del Resumen), con la misma funcionalidad. |

@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react";
 import { DeleteButton } from "@/components/buttons";
 import { Field, FormDialog, type ActionResult } from "@/components/FormDialog";
-import { agregarFechas, asignarSabado, borrarSabado, crearAgente, editarAgente, liberar, postularme } from "./sabados-actions";
+import { agregarFechas, asignarSabado, borrarSabado, crearAgente, editarAgente, liberar, postularme } from "./actions";
 
 export type Sabado = {
   id: number;
@@ -154,7 +154,7 @@ export function Sabados({
   return (
     <section>
       <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-        <h2 className="titulo">Atención de los sábados</h2>
+        <h1 className="titulo-pagina">Atención de los sábados</h1>
         {esAdmin && (
           <FormDialog trigger="+ Agregar fechas" triggerClassName="btn" title="Agregar sábados" action={agregarFechas} submitLabel="Agregar">
             <p className="text-sm text-slate-600">
