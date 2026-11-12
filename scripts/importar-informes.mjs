@@ -2,7 +2,9 @@
 //
 // Uso:  node scripts/importar-informes.mjs notas-release.json ["Notas de release"]
 //
-// El JSON es una lista de objetos con: titulo, contenido (Markdown) y, opcionales, fecha (AAAA-MM-DD) y categoria.
+// El JSON es una lista de objetos con: titulo, contenido (Markdown) y, opcionales, fecha (AAAA-MM-DD), categoria e imagenes.
+// imagenes: { "clave": "ruta/al/archivo.png", ... } (rutas relativas al JSON). En el contenido se referencian como
+// ![texto](imagen:clave); al importar se guardan en la base y el enlace pasa a /imagenes/<id> (solo visible con sesión).
 // La categoría del segundo argumento se usa para los que no traen una (por defecto "Notas de release").
 // La fecha queda como "actualizado", así el listado respeta el orden en que se publicaron.
 //
@@ -10,6 +12,7 @@
 // Los informes que ya existen (mismo título y categoría) se saltean, así que se puede volver a correr sin duplicar.
 
 import { readFileSync } from "node:fs";
+import { dirname, extname, resolve } from "node:path";
 
 const [archivo, categoriaPorDefecto = "Notas de release"] = process.argv.slice(2);
 if (!archivo) {
@@ -37,7 +40,7 @@ lista.forEach((x, i) => {
   const fecha = typeof x?.fecha === "string" && /^\d{4}-\d{2}-\d{2}$/.test(x.fecha) ? x.fecha : null;
   if (!titulo) errores.push(`Elemento ${i + 1}: falta el título`);
   else if (x.fecha && !fecha) errores.push(`Elemento ${i + 1}: fecha "${x.fecha}" inválida (AAAA-MM-DD)`);
-  else informes.push({ titulo, categoria: x.categoria?.trim() || categoriaPorDefecto, contenido: String(x.contenido ?? ""), fecha });
+  else informes.push({ titulo, categoria: x.categoria?.trim() || categoriaPorDefecto, contenido: String(x.contenido ?? ""), fecha, imagenes: x.imagenes ?? {} });
 });
 
 if (errores.length) {
@@ -61,14 +64,15 @@ if (process.env.DATABASE_URL) {
   console.log("Base: local (.data/pglite)");
 }
 
-const [{ existe }] = await query("select to_regclass('public.informes') is not null as existe", []);
+const [{ existe }] = await query("select to_regclass('public.informes') is not null and to_regclass('public.imagenes') is not null as existe", []);
 if (!existe) {
-  console.error("La base todavía no tiene la tabla de informes: abrí la aplicación una vez para que se cree y volvé a correr el script.");
+  console.error("La base todavía no tiene las tablas de informes e imágenes: abrí la aplicación (con esta versión) una vez para que se creen y volvé a correr el script.");
   await cerrar();
   process.exit(1);
 }
 
 // ---- Alta ----
+const TIPOS = { ".png": "image/png", ".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".gif": "image/gif", ".webp": "image/webp" };
 // "actualizado" se guarda en UTC: el mediodía de Argentina de esa fecha son las 15:00 UTC.
 let creados = 0;
 for (const i of informes) {
@@ -77,10 +81,20 @@ for (const i of informes) {
     console.log(`  = ${i.titulo} (ya existe)`);
     continue;
   }
+  // Imágenes referenciadas como ![...](imagen:clave): se guardan y el enlace pasa a /imagenes/<id>.
+  let contenido = i.contenido;
+  for (const clave of new Set([...contenido.matchAll(/\]\(imagen:([^)\s]+)\)/g)].map((m) => m[1]))) {
+    const ruta = i.imagenes[clave];
+    const tipo = TIPOS[extname(ruta ?? "").toLowerCase()];
+    if (!ruta || !tipo) throw new Error(`${i.titulo}: falta la imagen "${clave}" o no es png/jpg/gif/webp.`);
+    const datos = readFileSync(resolve(dirname(archivo), ruta)).toString("base64");
+    const [{ id }] = await query("insert into imagenes (tipo, datos) values ($1, $2) returning id", [tipo, datos]);
+    contenido = contenido.replaceAll(`](imagen:${clave})`, `](/imagenes/${id})`);
+  }
   await query(
     `insert into informes (titulo, categoria, contenido, actualizado)
      values ($1, $2, $3, coalesce($4::date + time '15:00', now() at time zone 'UTC'))`,
-    [i.titulo, i.categoria, i.contenido, i.fecha],
+    [i.titulo, i.categoria, contenido, i.fecha],
   );
   creados++;
   console.log(`  + ${i.titulo}`);

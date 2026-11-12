@@ -8,6 +8,10 @@ export function Markdown({ children, className = "" }: { children: string; class
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         components={{
+          img: ({ src, alt }) => (
+            // eslint-disable-next-line @next/next/no-img-element -- capturas de informes servidas por /imagenes/<id>, de tamaño variable
+            <img src={typeof src === "string" ? src : undefined} alt={alt ?? ""} loading="lazy" />
+          ),
           a: ({ href, children }) => (
             <a href={href} target="_blank" rel="noreferrer">
               {children}

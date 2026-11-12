@@ -9,8 +9,9 @@ import { seedBase, seedDemo } from "./seed";
  * La 4 agrega contactos. La 5 agrega la atención de los sábados. La 6 agrega las contraseñas fijas.
  * La 7 agrega fechas (desde/hasta) y persona a las novedades, y el color de cada usuario en el calendario.
  * La 8 agrega los indicadores mensuales (rings perdidos, llamadas atendidas, tickets resueltos).
+ * La 9 agrega las imágenes de los informes.
  */
-const VERSION = 8;
+const VERSION = 9;
 
 const DDL = [
   `create table if not exists usuarios (
@@ -139,6 +140,13 @@ const DDL = [
     dia_semana int not null default 0 check (dia_semana between 0 and 7),
     valor int not null check (valor >= 0),
     primary key (indicador, anio, mes, dia_semana)
+  )`,
+  // Imágenes de los informes (capturas). Se guardan en base64 y se sirven en /imagenes/<id> solo con sesión iniciada.
+  `create table if not exists imagenes (
+    id serial primary key,
+    tipo text not null check (tipo in ('image/png', 'image/jpeg', 'image/gif', 'image/webp')),
+    datos text not null,
+    creado timestamp not null default (now() at time zone 'UTC')
   )`,
   `create table if not exists schema_version (version int not null)`,
 ];

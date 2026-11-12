@@ -250,6 +250,9 @@ body {
   .markdown td {
     @apply border border-slate-200 px-2 py-1;
   }
+  .markdown img {
+    @apply my-2 h-auto max-w-full rounded-md border border-slate-200;
+  }
   .markdown hr {
     @apply border-slate-200;
   }

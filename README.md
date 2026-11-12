@@ -102,7 +102,7 @@ Abrí http://localhost:3000 e ingresá con `ADMIN_EMAIL` / `ADMIN_PASSWORD`. Si 
 
 La primera vez que arranca, la aplicación crea las tablas y el usuario administrador, y carga las **15 empresas con soporte Básico**, las tarifas, la tabla de tareas cotizables vigentes y el **cronograma de sábados** inicial. En una base nueva agrega además **datos de ejemplo** (respuestas, novedades, informes y algunos casos con tickets ficticios); con `SEED_DEMO=false` no se cargan.
 
-**Actualización de bases existentes:** la base guarda su versión de esquema (tabla `schema_version`, hoy versión 8). Al desplegar una versión nueva, las tablas que faltan se crean y se cargan solas en el primer acceso, sin tocar los datos existentes. Las tablas de la versión 1 (`planes`, `empresas`, `llamadas`, `tareas`) quedan sin uso y no se borran; se pueden eliminar a mano cuando ya no hagan falta.
+**Actualización de bases existentes:** la base guarda su versión de esquema (tabla `schema_version`, hoy versión 9). Al desplegar una versión nueva, las tablas que faltan se crean y se cargan solas en el primer acceso, sin tocar los datos existentes. Las tablas de la versión 1 (`planes`, `empresas`, `llamadas`, `tareas`) quedan sin uso y no se borran; se pueden eliminar a mano cuando ya no hagan falta.
 
 ## Variables de entorno
 
@@ -180,6 +180,8 @@ node scripts/importar-informes.mjs notas-release.json
 
 El JSON es una lista de `{ "titulo", "contenido", "fecha": "AAAA-MM-DD", "categoria" }` (fecha y categoría son opcionales; la categoría por defecto es "Notas de release" o la que se pase como segundo argumento). La fecha queda como fecha del informe, así se ordenan como se publicaron. Los que ya existen (mismo título y categoría) se saltean, así que se puede volver a correr con mails nuevos sin duplicar. `notas-release.json` no se sube a git.
 
+
+**Imágenes:** cada informe del JSON puede traer `"imagenes": { "clave": "carpeta/archivo.png" }` (rutas relativas al JSON) y referenciarlas en el contenido como `![Captura](imagen:clave)`. Al importar, las imágenes se guardan en la base (tabla `imagenes`) y el enlace pasa a `/imagenes/<id>`, que solo se ve con sesión iniciada (son capturas internas). Admite png, jpg, gif y webp.
 ## Estructura
 
 ```
@@ -229,3 +231,4 @@ Las horas se manejan en hora de Argentina (UTC−3).
 | 04/11/2026 | **Indicadores** (solo administradores): rings perdidos, llamadas atendidas y tickets resueltos por mes y año, con gráficos de barras por día de la semana y por mes, e importación de la planilla de rings perdidos. |
 | 10/11/2026 | **Cotizador:** el botón Copiar arma el texto para el cliente ("El valor de la tarea es de: $ … + IVA." y la validez del presupuesto: 5 días o hasta fin de mes, lo que suceda primero). |
 | 11/11/2026 | **Sábados** pasa a ser una pestaña propia (antes estaba dentro del Resumen), con la misma funcionalidad. |
+| 12/11/2026 | **Informes con imágenes:** los informes pueden mostrar capturas (guardadas en la base y visibles solo con sesión). Se importó *Configuración e Implementación de Terminales POS Payway* (General) con sus 44 capturas. |
