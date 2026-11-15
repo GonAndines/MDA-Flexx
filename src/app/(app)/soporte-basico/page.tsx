@@ -21,7 +21,9 @@ export default async function SoporteBasicoPage({ searchParams }: PageProps<"/so
   const [empresas, casos] = await Promise.all([
     query<EmpresaBasico>(
       `select e.id, e.nombre, e.notas, e.activa,
-              (select count(*)::int from casos c where c.empresa_id = e.id and c.fecha >= date_trunc('month', ${AHORA_AR})) as casos_mes,
+              (select count(*)::int from casos c where c.empresa_id = e.id
+                 and c.fecha >= date_trunc('month', ${AHORA_AR})
+                 and c.fecha < date_trunc('month', ${AHORA_AR}) + interval '1 month') as casos_mes,
               (select count(*)::int from casos c where c.empresa_id = e.id) as casos_total,
               (select c.ticket::text from casos c where c.empresa_id = e.id order by c.fecha desc, c.id desc limit 1) as ultimo_ticket
        from empresas_basico e order by e.activa desc, e.nombre`,

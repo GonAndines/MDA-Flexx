@@ -34,10 +34,15 @@ async function ticketRepetido(ticket: string, excluirId = 0) {
   return otro ? { error: `El ticket ${ticket} ya está registrado (${otro.empresa}, ${otro.fecha}).` } : null;
 }
 
+async function empresaExiste(id: number) {
+  return Boolean(await queryOne("select 1 from empresas_basico where id = $1", [id]));
+}
+
 export async function crearCaso(fd: FormData) {
   const usuario = await requireUsuario();
   const r = leerCaso(fd);
   if ("error" in r) return r;
+  if (!(await empresaExiste(r.datos[0]))) return { error: "Esa empresa ya no existe. Actualizá la página." };
   const repetido = await ticketRepetido(r.datos[1]);
   if (repetido) return repetido;
   await query("insert into casos (empresa_id, ticket, fecha, notas, usuario_id) values ($1, $2, $3, $4, $5)", [
@@ -51,6 +56,7 @@ export async function editarCaso(id: number, fd: FormData) {
   await requireUsuario();
   const r = leerCaso(fd);
   if ("error" in r) return r;
+  if (!(await empresaExiste(r.datos[0]))) return { error: "Esa empresa ya no existe. Actualizá la página." };
   const repetido = await ticketRepetido(r.datos[1], id);
   if (repetido) return repetido;
   await query("update casos set empresa_id = $2, ticket = $3, fecha = $4, notas = $5 where id = $1", [id, ...r.datos]);
