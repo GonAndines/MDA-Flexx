@@ -2,20 +2,20 @@
 
 import { revalidatePath } from "next/cache";
 import { requireAdmin } from "@/lib/auth";
-import { query } from "@/lib/db";
+import { transaction, type Sentencia } from "@/lib/db";
 import { DIAS, leerRingsPerdidos, type Indicador } from "@/lib/indicadores";
 
 type Fila = { indicador: Indicador; anio: number; mes: number; dia: number; valor: number };
 
-/** Inserta o reemplaza valores (un solo insert con todas las filas). */
-async function guardar(filas: Fila[]) {
-  if (!filas.length) return;
+/** Sentencia que inserta o reemplaza valores (un solo insert con todas las filas). */
+function sentenciaGuardar(filas: Fila[]): Sentencia | null {
+  if (!filas.length) return null;
   const valores = filas.map((_, i) => `($${i * 5 + 1}, $${i * 5 + 2}, $${i * 5 + 3}, $${i * 5 + 4}, $${i * 5 + 5})`).join(", ");
-  await query(
-    `insert into indicadores (indicador, anio, mes, dia_semana, valor) values ${valores}
+  return {
+    text: `insert into indicadores (indicador, anio, mes, dia_semana, valor) values ${valores}
      on conflict (indicador, anio, mes, dia_semana) do update set valor = excluded.valor`,
-    filas.flatMap((f) => [f.indicador, f.anio, f.mes, f.dia, f.valor]),
-  );
+    params: filas.flatMap((f) => [f.indicador, f.anio, f.mes, f.dia, f.valor]),
+  };
 }
 
 const anioValido = (v: unknown) => {
@@ -39,8 +39,11 @@ export async function importarRings(fd: FormData) {
     return { error: e instanceof Error ? e.message : "No se pudo leer el archivo." };
   }
   // Cada mes importado reemplaza su detalle completo (por si antes tenía un día que ahora no viene).
-  await query(`delete from indicadores where indicador = 'rings_perdidos' and anio = $1 and mes = any($2::int[])`, [anio, leidos.meses]);
-  await guardar(leidos.filas.map((f) => ({ indicador: "rings_perdidos", anio, mes: f.mes, dia: f.dia, valor: f.valor })));
+  const insertar = sentenciaGuardar(leidos.filas.map((f) => ({ indicador: "rings_perdidos", anio, mes: f.mes, dia: f.dia, valor: f.valor })));
+  await transaction([
+    { text: `delete from indicadores where indicador = 'rings_perdidos' and anio = $1 and mes = any($2::int[])`, params: [anio, leidos.meses] },
+    ...(insertar ? [insertar] : []),
+  ]);
   revalidatePath("/indicadores");
 }
 
@@ -63,11 +66,16 @@ export async function guardarMes(anio: number, mes: number, fd: FormData) {
     return { error: "Las cantidades tienen que ser números enteros, sin decimales ni negativos." };
   }
 
-  await query("delete from indicadores where anio = $1 and mes = $2", [anio, mes]);
   const filas: Fila[] = [];
   if (rings.some((n) => n !== null)) rings.forEach((n, i) => filas.push({ indicador: "rings_perdidos", anio, mes, dia: i + 1, valor: n ?? 0 }));
   if (llamadas !== null) filas.push({ indicador: "llamadas_atendidas", anio, mes, dia: 0, valor: llamadas });
   if (tickets !== null) filas.push({ indicador: "tickets_resueltos", anio, mes, dia: 0, valor: tickets });
-  await guardar(filas);
+  const insertar = sentenciaGuardar(filas);
+
+  // Borrar y volver a escribir el mes tiene que ser atómico: si el insert falla, no se pierden los datos viejos.
+  await transaction([
+    { text: "delete from indicadores where anio = $1 and mes = $2", params: [anio, mes] },
+    ...(insertar ? [insertar] : []),
+  ]);
   revalidatePath("/indicadores");
 }

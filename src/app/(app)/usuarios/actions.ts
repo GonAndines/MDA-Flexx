@@ -48,15 +48,13 @@ export async function editarUsuario(id: number, fd: FormData) {
   if (await queryOne("select 1 from usuarios where email = $1 and id <> $2", [email, id])) {
     return { error: "Ya existe un usuario con ese email." };
   }
-  await query("update usuarios set nombre = $2, email = $3, rol = $4, activo = $5, color = $6 where id = $1", [
-    id,
-    nombre,
-    email,
-    rol,
-    activo,
-    leerColor(fd),
-  ]);
-  if (clave) await query("update usuarios set password_hash = $2 where id = $1", [id, await bcrypt.hash(clave, 10)]);
+  // Un solo update: si la contraseña viene vacía, `coalesce` deja la que ya estaba.
+  await query(
+    `update usuarios set nombre = $2, email = $3, rol = $4, activo = $5, color = $6,
+            password_hash = coalesce($7, password_hash)
+     where id = $1`,
+    [id, nombre, email, rol, activo, leerColor(fd), clave ? await bcrypt.hash(clave, 10) : null],
+  );
   revalidatePath("/usuarios");
   revalidatePath("/");
 }

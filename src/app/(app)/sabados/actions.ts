@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { requireAdmin, requireUsuario } from "@/lib/auth";
 import { sincronizarAgentes } from "@/lib/agentes";
-import { AHORA_AR, query, queryOne } from "@/lib/db";
+import { AHORA_AR, query, queryOne, transaction, type Sentencia } from "@/lib/db";
 import { numero, texto } from "@/lib/format";
 
 /** Sábados que cada agente puede tomar por tanda, para cada rol. */
@@ -127,24 +127,30 @@ function leerAgente(fd: FormData) {
  * Un usuario tiene un solo agente. Si se lo vincula a otro (por ejemplo, al nombre que figuraba en el Excel),
  * se suelta del anterior; si ese anterior no tiene ningún sábado, se borra.
  */
-async function soltarUsuario(usuarioId: number | null, exceptoId = 0) {
-  if (!usuarioId) return;
-  await query("update agentes set usuario_id = null where usuario_id = $1 and id <> $2", [usuarioId, exceptoId]);
-  await query(
-    `delete from agentes a where a.usuario_id is null and a.id <> $1
+function sentenciasSoltarUsuario(usuarioId: number | null, exceptoId = 0): Sentencia[] {
+  if (!usuarioId) return [];
+  return [
+    { text: "update agentes set usuario_id = null where usuario_id = $1 and id <> $2", params: [usuarioId, exceptoId] },
+    {
+      text: `delete from agentes a where a.usuario_id is null and a.id <> $1
        and not exists (select 1 from sabados s where s.activa_id = a.id or s.pasiva_id = a.id)
        and a.nombre = (select nombre from usuarios where id = $2)`,
-    [exceptoId, usuarioId],
-  );
+      params: [exceptoId, usuarioId],
+    },
+  ];
 }
 
 export async function crearAgente(fd: FormData) {
   await requireAdmin();
   const r = leerAgente(fd);
   if ("error" in r) return r;
-  await soltarUsuario(r.usuario);
   try {
-    await query("insert into agentes (nombre, usuario_id) values ($1, $2)", [r.nombre, r.usuario]);
+    // Soltar el usuario del agente anterior y crear el nuevo tienen que ir juntos:
+    // si el nombre está duplicado, se revierte todo y no queda un usuario suelto.
+    await transaction([
+      ...sentenciasSoltarUsuario(r.usuario),
+      { text: "insert into agentes (nombre, usuario_id) values ($1, $2)", params: [r.nombre, r.usuario] },
+    ]);
   } catch (e) {
     if (esDuplicado(e)) return { error: "Ya existe un agente con ese nombre." };
     throw e;
@@ -156,13 +162,13 @@ export async function editarAgente(id: number, fd: FormData) {
   await requireAdmin();
   const r = leerAgente(fd);
   if ("error" in r) return r;
-  await soltarUsuario(r.usuario, id);
   try {
-    await query("update agentes set nombre = $2, usuario_id = $3, activo = $4 where id = $1", [
-      id,
-      r.nombre,
-      r.usuario,
-      fd.get("activo") === "on",
+    await transaction([
+      ...sentenciasSoltarUsuario(r.usuario, id),
+      {
+        text: "update agentes set nombre = $2, usuario_id = $3, activo = $4 where id = $1",
+        params: [id, r.nombre, r.usuario, fd.get("activo") === "on"],
+      },
     ]);
   } catch (e) {
     if (esDuplicado(e)) return { error: "Ya existe un agente con ese nombre." };
