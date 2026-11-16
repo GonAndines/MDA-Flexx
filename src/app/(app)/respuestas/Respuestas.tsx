@@ -30,7 +30,7 @@ function Campos({ r, categorias }: { r?: Respuesta; categorias: string[] }) {
   );
 }
 
-export function Respuestas({ respuestas }: { respuestas: Respuesta[] }) {
+export function Respuestas({ respuestas, agente }: { respuestas: Respuesta[]; agente: string }) {
   const [busqueda, setBusqueda] = useState("");
   const [categoria, setCategoria] = useState("");
   const categorias = useMemo(() => [...new Set(respuestas.map((r) => r.categoria))].sort(), [respuestas]);
@@ -87,7 +87,7 @@ export function Respuestas({ respuestas }: { respuestas: Respuesta[] }) {
             </div>
             <p className="flex-1 text-sm whitespace-pre-wrap text-slate-600">{r.texto}</p>
             <div className="mt-3 flex items-center gap-1">
-              <CopyButton text={r.texto} />
+              <CopyButton text={r.texto.replace(/\[nombre del agente\]/gi, agente)} />
               <FormDialog trigger="Editar" triggerClassName="btn-link" title="Editar respuesta" action={editarRespuesta.bind(null, r.id)}>
                 <Campos r={r} categorias={categorias} />
               </FormDialog>
