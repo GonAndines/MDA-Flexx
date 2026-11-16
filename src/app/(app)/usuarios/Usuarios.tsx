@@ -63,7 +63,7 @@ export function Usuarios({ usuarios, yoId }: { usuarios: UsuarioFila[]; yoId: nu
           <Campos />
         </FormDialog>
       </div>
-      <div className="card overflow-x-auto">
+      <div className="card overflow-x-auto" role="region" aria-label="Usuarios de la mesa de ayuda" tabIndex={0}>
         <table className="table">
           <thead>
             <tr>

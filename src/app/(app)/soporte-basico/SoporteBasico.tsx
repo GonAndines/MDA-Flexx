@@ -142,7 +142,7 @@ function CamposEmpresa({ e }: { e?: EmpresaBasico }) {
 
 export function Empresas({ empresas }: { empresas: EmpresaBasico[] }) {
   return (
-    <div className="card overflow-x-auto">
+    <div className="card overflow-x-auto" role="region" aria-label="Empresas con soporte Básico" tabIndex={0}>
       <div className="flex items-center justify-between px-4 pt-3 pb-2">
         <h2 className="titulo">Empresas con soporte Básico · mes actual</h2>
         <FormDialog trigger="+ Empresa" triggerClassName="btn" title="Agregar empresa con soporte Básico" action={crearEmpresa}>
@@ -204,7 +204,7 @@ export function Empresas({ empresas }: { empresas: EmpresaBasico[] }) {
 
 export function Casos({ casos, empresas }: { casos: Caso[]; empresas: EmpresaBasico[] }) {
   return (
-    <div className="card overflow-x-auto">
+    <div className="card overflow-x-auto" role="region" aria-label="Casos de soporte Básico" tabIndex={0}>
       <table className="table">
         <thead>
           <tr>

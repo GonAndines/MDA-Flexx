@@ -257,3 +257,26 @@ body {
     @apply border-slate-200;
   }
 }
+
+/*
+ * Diálogos modales: contener el scroll evita que el gesto sobre el backdrop o dentro del
+ * diálogo siga moviendo la página de atrás. ::backdrop no es un contenedor de scroll, así
+ * que necesita sus propias reglas.
+ */
+dialog:modal {
+  overscroll-behavior: contain;
+}
+dialog::backdrop {
+  overflow: hidden;
+  overscroll-behavior: contain;
+}
+
+/*
+ * Validación de formularios: :user-invalid recién pinta el campo después de que la persona
+ * lo tocó y lo dejó (o intentó enviar), en vez de mostrar en rojo todo campo vacío apenas
+ * se entra. :is() mantiene la regla entera si el navegador no conoce el pseudo-clase.
+ */
+:is(input, select, textarea):user-invalid {
+  border-color: var(--color-red-500);
+  background-color: var(--color-red-50);
+}

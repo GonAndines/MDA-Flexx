@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, useTransition, type ReactNode } from "react";
+import { useId, useRef, useState, useTransition, type ReactNode } from "react";
 
 export type ActionResult = { error?: string } | void;
 
@@ -25,6 +25,8 @@ export function FormDialog({
   const dialog = useRef<HTMLDialogElement>(null);
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
+  // Nombre accesible del diálogo: el lector de pantalla lee el título al abrirlo.
+  const idTitulo = useId();
   // Cambia en cada apertura para remontar los campos: así arrancan limpios con sus valores iniciales.
   const [apertura, setApertura] = useState(0);
 
@@ -43,6 +45,7 @@ export function FormDialog({
       </button>
       <dialog
         ref={dialog}
+        aria-labelledby={idTitulo}
         className={`m-auto w-[calc(100%-2rem)] rounded-xl bg-surface p-0 text-left text-[inherit] shadow-2xl backdrop:bg-black/50 ${wide ? "max-w-2xl" : "max-w-lg"}`}
       >
         <form
@@ -57,12 +60,18 @@ export function FormDialog({
           }}
         >
           <div className="border-b border-slate-200 px-5 py-3">
-            <h2 className="font-bold text-slate-900">{title}</h2>
+            <h2 id={idTitulo} className="font-bold text-slate-900">
+              {title}
+            </h2>
           </div>
           <div key={apertura} className="max-h-[70vh] space-y-3 overflow-y-auto px-5 py-4">
             {apertura > 0 && children}
           </div>
-          {error && <p className="mx-5 mb-3 rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
+          {error && (
+            <p role="alert" className="mx-5 mb-3 rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">
+              {error}
+            </p>
+          )}
           <div className="flex justify-end gap-2 border-t border-slate-200 px-5 py-3">
             <button type="button" className="btn" onClick={() => dialog.current?.close()}>
               Cancelar

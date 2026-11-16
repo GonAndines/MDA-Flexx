@@ -195,7 +195,7 @@ export function Sabados({
         <p className="mb-2 text-xs text-slate-500">Tu usuario no figura como agente activo de los sábados.</p>
       )}
 
-      <div className="card overflow-x-auto">
+      <div className="card overflow-x-auto" role="region" aria-label="Sábados del mes" tabIndex={0}>
         <table className="table">
           <thead>
             <tr>

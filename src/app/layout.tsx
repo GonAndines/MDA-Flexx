@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Atkinson_Hyperlegible_Mono, Atkinson_Hyperlegible_Next } from "next/font/google";
+import { Validacion } from "@/components/Validacion";
 import { leerTema } from "@/lib/tema";
 import "./globals.css";
 
@@ -22,7 +23,10 @@ export const metadata: Metadata = {
 export default async function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="es" data-theme={await leerTema()} className={`${atkinson.variable} ${atkinsonMono.variable} h-full antialiased`}>
-      <body className="flex min-h-full flex-col font-sans">{children}</body>
+      <body className="flex min-h-full flex-col font-sans">
+        {children}
+        <Validacion />
+      </body>
     </html>
   );
 }

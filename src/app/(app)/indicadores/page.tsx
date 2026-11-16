@@ -165,7 +165,7 @@ export default async function IndicadoresPage({ searchParams }: PageProps<"/indi
           />
         </div>
 
-        <div className="card overflow-x-auto">
+        <div className="card overflow-x-auto" role="region" aria-label="Indicadores por mes" tabIndex={0}>
           <table className="table">
             <thead>
               <tr>
