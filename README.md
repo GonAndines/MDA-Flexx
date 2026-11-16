@@ -50,7 +50,7 @@ Calendario mensual (de lunes a domingo) con las novedades del equipo: vacaciones
 
 - Cada novedad es **un día** o un **rango** (*Desde* / *Hasta*; si *Hasta* queda vacío, es un solo día) y puede ser de **una persona** o de **todo el equipo**.
 - En el calendario se ve como una barra del **color de la persona** que cruza los días que dura (las de todo el equipo, en gris). Al tocarla, baja al detalle.
-- Debajo del calendario se listan las novedades del mes con su detalle.
+- Debajo del calendario, **Detalle de las novedades del mes** está plegado: se despliega con un clic y cada novedad es una fila que se abre para ver su texto. Se ven unas 5 filas y el resto con la barra de desplazamiento. Tocar una barra del calendario abre esa novedad.
 - **Solo el administrador** las carga, edita y borra (**+ Novedad**). Los demás usuarios las ven.
 - El color de cada usuario se elige en **Usuarios → Editar** (*Color en el calendario de novedades*). Si no se elige, se asigna uno automático.
 
@@ -232,3 +232,4 @@ Las horas se manejan en hora de Argentina (UTC−3).
 | 10/11/2026 | **Cotizador:** el botón Copiar arma el texto para el cliente ("El valor de la tarea es de: $ … + IVA." y la validez del presupuesto: 5 días o hasta fin de mes, lo que suceda primero). |
 | 11/11/2026 | **Sábados** pasa a ser una pestaña propia (antes estaba dentro del Resumen), con la misma funcionalidad. |
 | 12/11/2026 | **Informes con imágenes:** los informes pueden mostrar capturas (guardadas en la base y visibles solo con sesión). Se importó *Configuración e Implementación de Terminales POS Payway* (General) con sus 44 capturas. |
+| 16/11/2026 | **Novedades del Resumen:** el detalle va plegado en un acordeón, cada novedad se abre por separado y la lista muestra de a 5 con barra de desplazamiento. |

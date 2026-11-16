@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import { DeleteButton } from "@/components/buttons";
 import { Field, FormDialog } from "@/components/FormDialog";
 import { Markdown } from "@/components/Markdown";
@@ -156,30 +157,73 @@ export function ListaNovedades({
       </p>
     );
   }
+  return <Acordeon novedades={novedades} personas={personas} esAdmin={esAdmin} hoy={hoy} />;
+}
+
+/**
+ * Detalle de las novedades plegado: se despliega con un clic y adentro cada novedad es una fila que se abre
+ * para ver el texto. La lista muestra unas 5 filas y el resto se recorre con la barra de desplazamiento.
+ * Al tocar una barra del calendario (#novedad-<id>) se abre todo y se va a esa novedad.
+ */
+function Acordeon({ novedades, personas, esAdmin, hoy }: { novedades: Novedad[]; personas: Persona[]; esAdmin: boolean; hoy: string }) {
+  const lista = useRef<HTMLDetailsElement>(null);
+
+  useEffect(() => {
+    const abrirDesdeEnlace = () => {
+      const item = document.getElementById(decodeURIComponent(location.hash.slice(1)));
+      if (!(item instanceof HTMLDetailsElement) || !lista.current?.contains(item)) return;
+      lista.current.open = true;
+      item.open = true;
+      item.scrollIntoView({ block: "nearest" });
+      lista.current.scrollIntoView({ block: "start" });
+    };
+    // También al volver a tocar la misma barra (el enlace no cambia y no hay "hashchange").
+    const alTocar = (e: MouseEvent) => {
+      if ((e.target as Element | null)?.closest('a[href^="#novedad-"]')) setTimeout(abrirDesdeEnlace);
+    };
+    abrirDesdeEnlace();
+    window.addEventListener("hashchange", abrirDesdeEnlace);
+    document.addEventListener("click", alTocar);
+    return () => {
+      window.removeEventListener("hashchange", abrirDesdeEnlace);
+      document.removeEventListener("click", alTocar);
+    };
+  }, []);
+
   return (
-    <div className="card divide-y divide-slate-200">
-      {novedades.map((n) => (
-        <article key={n.id} id={`novedad-${n.id}`} className="scroll-mt-6 p-4 target:bg-blue-50">
-          <div className="flex items-start justify-between gap-3">
-            <div className="flex flex-wrap items-center gap-2">
-              <span style={estiloColor(n.color)} className="color-persona rounded-md px-2 py-0.5 text-xs font-bold">
+    <details ref={lista} className="card group/lista scroll-mt-6">
+      <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-4 py-3 font-bold text-slate-800 hover:bg-slate-50 [&::-webkit-details-marker]:hidden">
+        <span>
+          Detalle de las novedades del mes <span className="font-normal text-slate-500">({novedades.length})</span>
+        </span>
+        <span aria-hidden className="text-slate-500 transition-transform group-open/lista:rotate-90">›</span>
+      </summary>
+      {/* Unas 5 filas visibles; el resto, con la barra de desplazamiento. */}
+      <div className="max-h-[14.5rem] divide-y divide-slate-200 overflow-y-auto border-t border-slate-200">
+        {novedades.map((n) => (
+          <details key={n.id} id={`novedad-${n.id}`} className="group/item scroll-mt-2 open:bg-slate-50/60">
+            <summary className="flex cursor-pointer list-none items-center gap-2 px-4 py-2.5 hover:bg-slate-50 [&::-webkit-details-marker]:hidden">
+              <span aria-hidden className="w-3 shrink-0 text-slate-400 transition-transform group-open/item:rotate-90">›</span>
+              <span style={estiloColor(n.color)} className="color-persona shrink-0 rounded-md px-2 py-0.5 text-xs font-bold">
                 {n.persona ?? "Todo el equipo"}
               </span>
-              <h3 className="font-bold text-slate-900">{n.titulo}</h3>
-              <span className="text-[13px] text-slate-500">{textoRango(n.desde, n.hasta)}</span>
+              <span className="min-w-0 truncate font-bold text-slate-900">{n.titulo}</span>
+              <span className="ml-auto shrink-0 text-[13px] text-slate-500">{textoRango(n.desde, n.hasta)}</span>
+            </summary>
+            <div className="px-4 pb-3 pl-9">
+              {n.texto ? <Markdown>{n.texto}</Markdown> : <p className="text-sm text-slate-500">Sin detalle.</p>}
+              {esAdmin && (
+                <div className="mt-2 -ml-2 flex">
+                  <FormDialog trigger="Editar" triggerClassName="btn-link" title="Editar novedad" action={editarNovedad.bind(null, n.id)} wide>
+                    <Campos n={n} personas={personas} hoy={hoy} />
+                  </FormDialog>
+                  <DeleteButton action={borrarNovedad.bind(null, n.id)} confirmText={`¿Borrar la novedad "${n.titulo}"?`} />
+                </div>
+              )}
             </div>
-            {esAdmin && (
-              <div className="flex shrink-0">
-                <FormDialog trigger="Editar" triggerClassName="btn-link" title="Editar novedad" action={editarNovedad.bind(null, n.id)} wide>
-                  <Campos n={n} personas={personas} hoy={hoy} />
-                </FormDialog>
-                <DeleteButton action={borrarNovedad.bind(null, n.id)} confirmText={`¿Borrar la novedad "${n.titulo}"?`} />
-              </div>
-            )}
-          </div>
-          {n.texto && <Markdown className="mt-2">{n.texto}</Markdown>}
-        </article>
-      ))}
-    </div>
+          </details>
+        ))}
+      </div>
+    </details>
   );
 }
