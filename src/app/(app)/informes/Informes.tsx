@@ -68,7 +68,24 @@ function Buscador({ q, categoria }: { q: string; categoria: string }) {
   );
 }
 
-export function Categorias({ resumen, categorias }: { resumen: ResumenCategoria[]; categorias: string[] }) {
+/**
+ * Pantalla de informes en dos columnas: las categorías a la izquierda y, a la derecha, los informes de la elegida
+ * (o los resultados de la búsqueda, si no hay categoría). En el celular las categorías quedan en una tira arriba.
+ */
+export function Informes({
+  resumen,
+  informes,
+  categoria,
+  q,
+  categorias,
+}: {
+  resumen: ResumenCategoria[];
+  informes: Informe[];
+  categoria: string;
+  q: string;
+  categorias: string[];
+}) {
+  const total = resumen.reduce((s, r) => s + r.cantidad, 0);
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -76,84 +93,79 @@ export function Categorias({ resumen, categorias }: { resumen: ResumenCategoria[
           <h1 className="titulo-pagina">Informes</h1>
           <p className="text-sm text-slate-500">Notas de release, uso del sistema, procedimientos y otra información relevante.</p>
         </div>
-        <NuevoInforme categorias={categorias} />
-      </div>
-
-      <Buscador q="" categoria="" />
-
-      {resumen.length === 0 && <p className="text-sm text-slate-500">Todavía no hay informes.</p>}
-
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        {resumen.map((r) => (
-          <Link key={r.categoria} href={urlCategoria(r.categoria)} className="card block p-4 hover:border-blue-300">
-            <div className="flex items-start justify-between gap-2">
-              <h2 className="text-lg font-bold text-slate-900">{r.categoria}</h2>
-              <span className="shrink-0 rounded-full bg-blue-50 px-2 py-0.5 text-sm font-medium text-blue-700 tabular-nums">{r.cantidad}</span>
-            </div>
-            <p className="mt-2 text-xs text-slate-400">
-              {r.cantidad === 1 ? "1 informe" : `${r.cantidad} informes`} · último {r.actualizado}
-            </p>
-          </Link>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-export function ListaInformes({
-  informes,
-  categoria,
-  q,
-  categorias,
-}: {
-  informes: Informe[];
-  categoria: string;
-  q: string;
-  categorias: string[];
-}) {
-  const titulo = categoria || "Resultados de la búsqueda";
-  return (
-    <div className="space-y-4">
-      <Link href="/informes" className="btn-link -ml-2">
-        ‹ Categorías
-      </Link>
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h1 className="titulo-pagina">{titulo}</h1>
-          <p className="text-sm text-slate-500">
-            {informes.length === 1 ? "1 informe" : `${informes.length} informes`}
-            {q && ` que ${informes.length === 1 ? "coincide" : "coinciden"} con "${q}"`}
-            {q && (
-              <>
-                {" · "}
-                <Link href={categoria ? urlCategoria(categoria) : "/informes"} className="text-blue-700 hover:underline">
-                  Limpiar búsqueda
-                </Link>
-              </>
-            )}
-          </p>
-        </div>
         <NuevoInforme categorias={categorias} categoria={categoria || undefined} />
       </div>
 
-      <Buscador q={q} categoria={categoria} />
+      {resumen.length === 0 ? (
+        <p className="text-sm text-slate-500">Todavía no hay informes.</p>
+      ) : (
+        <div className="grid gap-4 lg:grid-cols-[15rem_minmax(0,1fr)] lg:items-start">
+          <nav aria-label="Categorías" className="card overflow-x-auto p-1.5 lg:sticky lg:top-6">
+            <ul className="flex gap-1 lg:flex-col">
+              {resumen.map((r) => {
+                const activa = r.categoria === categoria;
+                return (
+                  <li key={r.categoria}>
+                    <Link
+                      href={urlCategoria(r.categoria)}
+                      aria-current={activa ? "page" : undefined}
+                      className={`flex items-center justify-between gap-3 rounded-md px-3 py-2 text-sm whitespace-nowrap ${
+                        activa ? "bg-blue-600 font-bold text-white" : "text-slate-700 hover:bg-slate-50"
+                      }`}
+                    >
+                      {r.categoria}
+                      <span className={`tabular-nums ${activa ? "text-blue-100" : "text-slate-400"}`}>{r.cantidad}</span>
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+            <p className="hidden border-t border-slate-200 px-3 pt-2 pb-1 text-xs text-slate-400 lg:mt-1.5 lg:block">{total} informes en total</p>
+          </nav>
 
-      {informes.length === 0 && <p className="text-sm text-slate-500">No hay informes que coincidan.</p>}
-
-      <ul className="card max-w-5xl divide-y divide-slate-200">
-        {informes.map((i) => (
-          <li key={i.id}>
-            <Link href={`/informes/${i.id}`} className="block px-4 py-3 hover:bg-slate-50">
-              <div className="flex items-start justify-between gap-3">
-                <h2 className="font-medium text-slate-900">{i.titulo}</h2>
-                <span className="shrink-0 text-xs text-slate-400 tabular-nums">{i.actualizado}</span>
+          <section className="min-w-0 space-y-3">
+            <div className="flex flex-wrap items-end justify-between gap-3">
+              <div>
+                <h2 className="titulo">{categoria || "Resultados de la búsqueda"}</h2>
+                <p className="mt-1 text-sm text-slate-500">
+                  {informes.length === 1 ? "1 informe" : `${informes.length} informes`}
+                  {q && ` que ${informes.length === 1 ? "coincide" : "coinciden"} con "${q}"`}
+                  {q && (
+                    <>
+                      {" · "}
+                      <Link href={categoria ? urlCategoria(categoria) : "/informes"} className="text-blue-700 hover:underline">
+                        Limpiar búsqueda
+                      </Link>
+                    </>
+                  )}
+                </p>
               </div>
-              {!categoria && <span className="mt-1 inline-block rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-600">{i.categoria}</span>}
-              <p className="mt-1 text-sm text-slate-600">{extracto(i.contenido)}</p>
-            </Link>
-          </li>
-        ))}
-      </ul>
+              <Buscador q={q} categoria={categoria} />
+            </div>
+
+            {informes.length === 0 ? (
+              <p className="text-sm text-slate-500">No hay informes que coincidan.</p>
+            ) : (
+              <ul className="card divide-y divide-slate-200">
+                {informes.map((i) => (
+                  <li key={i.id}>
+                    <Link href={`/informes/${i.id}`} className="block px-4 py-3 hover:bg-slate-50">
+                      <div className="flex items-start justify-between gap-3">
+                        <h3 className="font-medium text-slate-900">{i.titulo}</h3>
+                        <span className="shrink-0 text-xs text-slate-400 tabular-nums">{i.actualizado}</span>
+                      </div>
+                      {!categoria && (
+                        <span className="mt-1 inline-block rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-600">{i.categoria}</span>
+                      )}
+                      <p className="mt-1 text-sm text-slate-600">{extracto(i.contenido)}</p>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
+        </div>
+      )}
     </div>
   );
 }

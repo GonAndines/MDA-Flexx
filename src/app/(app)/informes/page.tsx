@@ -1,6 +1,6 @@
 import { query } from "@/lib/db";
 import { CATEGORIAS_SUGERIDAS, SELECT_INFORMES, normalizar } from "@/lib/informes";
-import { Categorias, ListaInformes, type Informe, type ResumenCategoria } from "./Informes";
+import { Informes, type Informe, type ResumenCategoria } from "./Informes";
 
 export const metadata = { title: "Informes · Mesa de ayuda" };
 
@@ -9,7 +9,6 @@ const SIN_ACENTOS = "translate(lower(i.titulo || ' ' || i.categoria || ' ' || i.
 export default async function InformesPage({ searchParams }: PageProps<"/informes">) {
   const sp = await searchParams;
   const uno = (v: string | string[] | undefined) => (Array.isArray(v) ? v[0] : v)?.trim() ?? "";
-  const categoria = uno(sp.categoria);
   const q = uno(sp.q);
 
   const resumen = await query<ResumenCategoria>(
@@ -18,10 +17,10 @@ export default async function InformesPage({ searchParams }: PageProps<"/informe
   );
   const categorias = [...new Set([...CATEGORIAS_SUGERIDAS, ...resumen.map((r) => r.categoria)])].sort();
 
-  // Portada: una tarjeta por categoría.
-  if (!categoria && !q) return <Categorias resumen={resumen} categorias={categorias} />;
+  // Sin categoría ni búsqueda se abre la primera categoría; con búsqueda y sin categoría, se busca en todas.
+  const categoria = uno(sp.categoria) || (q ? "" : (resumen[0]?.categoria ?? ""));
+  if (!categoria && !q) return <Informes resumen={resumen} informes={[]} categoria="" q="" categorias={categorias} />;
 
-  // Listado de una categoría y/o resultados de búsqueda.
   const condiciones: string[] = [];
   const params: string[] = [];
   if (categoria) {
@@ -34,5 +33,5 @@ export default async function InformesPage({ searchParams }: PageProps<"/informe
   }
   const informes = await query<Informe>(`${SELECT_INFORMES} where ${condiciones.join(" and ")} order by i.actualizado desc, i.id desc`, params);
 
-  return <ListaInformes informes={informes} categoria={categoria} q={q} categorias={categorias} />;
+  return <Informes resumen={resumen} informes={informes} categoria={categoria} q={q} categorias={categorias} />;
 }
