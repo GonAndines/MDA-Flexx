@@ -5,11 +5,14 @@ import { redirect } from "next/navigation";
 import { requireUsuario } from "@/lib/auth";
 import { query, queryOne } from "@/lib/db";
 import { texto } from "@/lib/format";
+import { CATEGORIAS } from "@/lib/informes";
 
 function leer(fd: FormData) {
   const titulo = texto(fd, "titulo");
   if (!titulo) return { error: "El título es obligatorio." } as const;
-  return { datos: [titulo, texto(fd, "categoria") || "General", texto(fd, "contenido")] } as const;
+  const categoria = texto(fd, "categoria");
+  if (!CATEGORIAS.includes(categoria)) return { error: "Elegí una categoría de la lista." } as const;
+  return { datos: [titulo, categoria, texto(fd, "contenido")] } as const;
 }
 
 function refrescar() {

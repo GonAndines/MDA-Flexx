@@ -1,5 +1,5 @@
 import { query } from "@/lib/db";
-import { CATEGORIAS_SUGERIDAS, SELECT_INFORMES, normalizar } from "@/lib/informes";
+import { SELECT_INFORMES, normalizar } from "@/lib/informes";
 import { Informes, type Informe, type ResumenCategoria } from "./Informes";
 
 export const metadata = { title: "Informes · Mesa de ayuda" };
@@ -15,11 +15,10 @@ export default async function InformesPage({ searchParams }: PageProps<"/informe
     `select categoria, count(*)::int as cantidad, to_char(max(actualizado) - interval '3 hours', 'DD/MM/YYYY') as actualizado
      from informes group by categoria order by categoria`,
   );
-  const categorias = [...new Set([...CATEGORIAS_SUGERIDAS, ...resumen.map((r) => r.categoria)])].sort();
 
   // Sin categoría ni búsqueda se abre la primera categoría; con búsqueda y sin categoría, se busca en todas.
   const categoria = uno(sp.categoria) || (q ? "" : (resumen[0]?.categoria ?? ""));
-  if (!categoria && !q) return <Informes resumen={resumen} informes={[]} categoria="" q="" categorias={categorias} />;
+  if (!categoria && !q) return <Informes resumen={resumen} informes={[]} categoria="" q="" />;
 
   const condiciones: string[] = [];
   const params: string[] = [];
@@ -33,5 +32,5 @@ export default async function InformesPage({ searchParams }: PageProps<"/informe
   }
   const informes = await query<Informe>(`${SELECT_INFORMES} where ${condiciones.join(" and ")} order by i.actualizado desc, i.id desc`, params);
 
-  return <Informes resumen={resumen} informes={informes} categoria={categoria} q={q} categorias={categorias} />;
+  return <Informes resumen={resumen} informes={informes} categoria={categoria} q={q} />;
 }

@@ -3,20 +3,16 @@ import { notFound } from "next/navigation";
 import { DeleteButton } from "@/components/buttons";
 import { FormDialog } from "@/components/FormDialog";
 import { Markdown } from "@/components/Markdown";
-import { query, queryOne } from "@/lib/db";
+import { queryOne } from "@/lib/db";
 import { borrarInforme, editarInforme } from "../actions";
-import { CATEGORIAS_SUGERIDAS, SELECT_INFORMES, urlCategoria } from "@/lib/informes";
+import { SELECT_INFORMES, urlCategoria } from "@/lib/informes";
 import { CamposInforme, type Informe } from "../Informes";
 
 export default async function InformePage({ params }: PageProps<"/informes/[id]">) {
   const id = Number((await params).id);
   if (!Number.isInteger(id)) notFound();
-  const [informe, cats] = await Promise.all([
-    queryOne<Informe>(`${SELECT_INFORMES} where i.id = $1`, [id]),
-    query<{ categoria: string }>("select distinct categoria from informes"),
-  ]);
+  const informe = await queryOne<Informe>(`${SELECT_INFORMES} where i.id = $1`, [id]);
   if (!informe) notFound();
-  const categorias = [...new Set([...CATEGORIAS_SUGERIDAS, ...cats.map((c) => c.categoria)])].sort();
 
   return (
     <div className="max-w-3xl space-y-4">
@@ -35,7 +31,7 @@ export default async function InformePage({ params }: PageProps<"/informes/[id]"
           </div>
           <div className="flex">
             <FormDialog trigger="Editar" triggerClassName="btn" title="Editar informe" action={editarInforme.bind(null, informe.id)} wide>
-              <CamposInforme i={informe} categorias={categorias} />
+              <CamposInforme i={informe} />
             </FormDialog>
             <DeleteButton action={borrarInforme.bind(null, informe.id)} confirmText={`¿Borrar el informe "${informe.titulo}"?`} />
           </div>

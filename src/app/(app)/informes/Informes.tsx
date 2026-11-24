@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Field, FormDialog } from "@/components/FormDialog";
 import { MarkdownEditor } from "@/components/MarkdownEditor";
-import { urlCategoria } from "@/lib/informes";
+import { CATEGORIAS, urlCategoria } from "@/lib/informes";
 import { crearInforme } from "./actions";
 
 export type Informe = { id: number; titulo: string; categoria: string; contenido: string; autor: string | null; actualizado: string };
@@ -17,7 +17,7 @@ function extracto(md: string) {
   return plano.length > 180 ? plano.slice(0, 180) + "…" : plano;
 }
 
-export function CamposInforme({ i, categorias, categoria }: { i?: Informe; categorias: string[]; categoria?: string }) {
+export function CamposInforme({ i, categoria }: { i?: Informe; categoria?: string }) {
   return (
     <>
       <div className="grid grid-cols-[1fr_14rem] gap-3">
@@ -25,12 +25,11 @@ export function CamposInforme({ i, categorias, categoria }: { i?: Informe; categ
           <input name="titulo" defaultValue={i?.titulo} required className="input" />
         </Field>
         <Field label="Categoría">
-          <input name="categoria" defaultValue={i?.categoria ?? categoria ?? ""} list="categorias-informes" className="input" />
-          <datalist id="categorias-informes">
-            {categorias.map((c) => (
-              <option key={c} value={c} />
+          <select name="categoria" defaultValue={i?.categoria ?? categoria ?? "General"} required className="input">
+            {CATEGORIAS.map((c) => (
+              <option key={c}>{c}</option>
             ))}
-          </datalist>
+          </select>
         </Field>
       </div>
       <Field label="Contenido">
@@ -40,10 +39,10 @@ export function CamposInforme({ i, categorias, categoria }: { i?: Informe; categ
   );
 }
 
-function NuevoInforme({ categorias, categoria }: { categorias: string[]; categoria?: string }) {
+function NuevoInforme({ categoria }: { categoria?: string }) {
   return (
     <FormDialog trigger="+ Nuevo informe" triggerClassName="btn-primary" title="Nuevo informe" action={crearInforme} wide>
-      <CamposInforme categorias={categorias} categoria={categoria} />
+      <CamposInforme categoria={categoria} />
     </FormDialog>
   );
 }
@@ -77,13 +76,11 @@ export function Informes({
   informes,
   categoria,
   q,
-  categorias,
 }: {
   resumen: ResumenCategoria[];
   informes: Informe[];
   categoria: string;
   q: string;
-  categorias: string[];
 }) {
   const total = resumen.reduce((s, r) => s + r.cantidad, 0);
   return (
@@ -93,7 +90,7 @@ export function Informes({
           <h1 className="titulo-pagina">Informes</h1>
           <p className="text-sm text-slate-500">Notas de release, uso del sistema, procedimientos y otra información relevante.</p>
         </div>
-        <NuevoInforme categorias={categorias} categoria={categoria || undefined} />
+        <NuevoInforme categoria={categoria || undefined} />
       </div>
 
       {resumen.length === 0 ? (

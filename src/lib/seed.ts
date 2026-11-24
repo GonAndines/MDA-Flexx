@@ -112,7 +112,7 @@ const RESPUESTAS: [string, string, string][] = [
 const INFORMES: [string, string, string][] = [
   [
     "Procedimiento: registrar un caso de soporte Básico",
-    "Procedimientos",
+    "Operativo",
     "1. Abrí la pestaña **Soporte Básico**.\n2. Tocá **Registrar caso**, elegí la empresa y cargá el número de ticket.\n3. Si la empresa ya tiene **5 casos en el mes**, la app lo avisa: ofrecé la consulta como **tarea adicional** usando el *Cotizador*.\n\n> El número de ticket abre directamente el ticket en el sistema de soporte.",
   ],
   [

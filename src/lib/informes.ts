@@ -1,4 +1,5 @@
-export const CATEGORIAS_SUGERIDAS = ["Notas de release", "Uso del sistema", "Procedimientos", "General"];
+/** Categorías de informes: lista cerrada, se elige con un desplegable. */
+export const CATEGORIAS = ["Comercial", "Notas de release", "General", "Operativo", "Otros"];
 
 /** Minúsculas y sin acentos, para buscar. */
 export const normalizar = (s: string) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
