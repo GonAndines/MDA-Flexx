@@ -5,6 +5,7 @@ import { CopyButton, DeleteButton } from "@/components/buttons";
 import { Field, FormDialog } from "@/components/FormDialog";
 import { formatHoras, formatPesos, IVA } from "@/lib/format";
 import { borrarTarea, crearTarea, editarTarea, editarTarifa } from "./actions";
+import { PresupuestoPdf } from "./Presupuesto";
 
 export type Tarifa = {
   id: number;
@@ -245,8 +246,9 @@ export function Cotizador({ tarifas, tipos, tareas }: { tarifas: Tarifa[]; tipos
               <div className="mt-2 text-sm text-slate-600 tabular-nums">
                 IVA {IVA * 100}%: {formatPesos(iva)} · Total con IVA: <strong>{formatPesos(neto + iva)}</strong>
               </div>
-              <div className="mt-3">
+              <div className="mt-3 flex flex-wrap gap-2">
                 <CopyButton text={textoCotizacion} />
+                <PresupuestoPdf neto={neto} tareaInicial={tarea ? [tarea.nombre, tarea.descripcion].filter(Boolean).join(": ") : ""} />
               </div>
             </>
           ) : (

@@ -151,6 +151,111 @@ body {
   color: var(--p-fg-o);
 }
 
+/*
+ * Presupuesto en PDF del Cotizador (Presupuesto.tsx): un nodo aparte del body que solo existe al imprimir.
+ * Colores fijos: el documento sale igual con el tema claro o el oscuro.
+ */
+.presupuesto {
+  display: none;
+}
+@media print {
+  @page {
+    size: A4;
+    margin: 0;
+  }
+  body {
+    background: #fff;
+  }
+  body > :not(.presupuesto) {
+    display: none !important;
+  }
+  .presupuesto {
+    display: block;
+    padding: 12mm 14mm;
+    color: #1a1a1a;
+    font-size: 11pt;
+    line-height: 1.45;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+  .presupuesto-header {
+    position: relative;
+    display: flex;
+    justify-content: flex-end;
+    height: 30mm;
+    margin-bottom: 14mm;
+    padding: 5mm 6mm 0 0;
+    background: #000;
+  }
+  .presupuesto-header address {
+    border-right: 1.5px solid #fff;
+    padding-right: 2.5mm;
+    color: #fff;
+    font-size: 10pt;
+    font-style: normal;
+    line-height: 1.3;
+    text-align: right;
+  }
+  .presupuesto-logo {
+    position: absolute;
+    bottom: -4mm;
+    left: 12mm;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 3mm 6mm 2mm;
+    border-radius: 3mm 3mm 0 0;
+    background: #fff;
+  }
+  .presupuesto-logo img {
+    width: 48mm;
+    height: auto;
+  }
+  .presupuesto-logo span {
+    color: #555;
+    font-size: 8.5pt;
+  }
+  .presupuesto-fecha {
+    text-align: right;
+  }
+  .presupuesto h1 {
+    margin-top: 2mm;
+    font-size: 16pt;
+    font-weight: 700;
+  }
+  .presupuesto-empresa {
+    font-size: 11pt;
+  }
+  .presupuesto hr {
+    margin: 4mm 0 6mm;
+    border: 0;
+    border-top: 1px solid #1a1a1a;
+  }
+  .presupuesto dl {
+    display: grid;
+    grid-template-columns: 52mm 1fr;
+  }
+  .presupuesto dt,
+  .presupuesto dd {
+    padding: 3.5mm 0;
+    border-bottom: 1px solid #d4d4d4;
+  }
+  .presupuesto dt {
+    font-weight: 700;
+  }
+  .presupuesto dd strong {
+    font-size: 13pt;
+  }
+  .presupuesto-iva {
+    display: block;
+    color: #555;
+    font-size: 9.5pt;
+  }
+  .presupuesto-tarea {
+    white-space: pre-wrap;
+  }
+}
+
 /* Foco visible para quien navega con teclado. */
 :focus-visible {
   outline: 2px solid var(--color-blue-500);
