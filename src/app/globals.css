@@ -246,11 +246,6 @@ body {
   .presupuesto dd strong {
     font-size: 13pt;
   }
-  .presupuesto-iva {
-    display: block;
-    color: #555;
-    font-size: 9.5pt;
-  }
   .presupuesto-tarea {
     white-space: pre-wrap;
   }
